@@ -1,6 +1,7 @@
-package com.salesianostriana.chefplanner.recipes;
+package com.salesianostriana.chefplanner.recipes.repository;
 
 
+import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +17,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             " FROM Recipe r" +
             " WHERE r.featured = true")
     Page<Recipe> findFeaturedRecipes(Pageable pageable);
+
+    Page<Recipe> findByFeaturedTrue(Pageable pageable);
+
 
 }

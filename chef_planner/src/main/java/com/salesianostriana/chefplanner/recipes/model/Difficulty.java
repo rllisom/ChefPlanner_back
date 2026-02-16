@@ -1,4 +1,4 @@
-package com.salesianostriana.chefplanner.recipes;
+package com.salesianostriana.chefplanner.recipes.model;
 
 public enum Difficulty {
     EASY,
