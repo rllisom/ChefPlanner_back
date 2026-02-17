@@ -55,6 +55,13 @@ public class RecipeService {
         return originalRecipe;
 
     }
+    //Buscar por texto
+    public List<Recipe> searchRecipesText(String texto) {
+        return repository.findAll()
+                .stream()
+                .filter(r -> r.getTitle().toLowerCase().contains(texto.toLowerCase()))
+                .toList();
+    }
 
     @Transactional
     public void deleteById(Long id) {
