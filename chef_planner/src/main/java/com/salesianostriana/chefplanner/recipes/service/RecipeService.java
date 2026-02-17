@@ -56,7 +56,7 @@ public class RecipeService {
 
     }
     //Buscar por texto
-    public List<Recipe> searchRecipesWithStreams(String texto) {
+    public List<Recipe> searchRecipesText(String texto) {
         return repository.findAll()
                 .stream()
                 .filter(r -> r.getTitle().toLowerCase().contains(texto.toLowerCase()))

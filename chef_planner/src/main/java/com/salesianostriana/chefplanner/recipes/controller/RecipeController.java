@@ -75,7 +75,7 @@ public class RecipeController {
             @Parameter(description = "Término de búsqueda (título o descripción)", example = "pasta")
             @RequestParam(name = "s") String term) {
 
-        return service.searchRecipesWithStreams(term).stream()
+        return service.searchRecipesText(term).stream()
                 .map(RecipeResponse::fromEntity)
                 .toList();
     }
