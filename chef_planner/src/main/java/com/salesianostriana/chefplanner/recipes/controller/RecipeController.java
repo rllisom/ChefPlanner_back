@@ -1,6 +1,7 @@
 package com.salesianostriana.chefplanner.recipes.controller;
 
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeDetailsResponse;
+import com.salesianostriana.chefplanner.recipes.Dto.RecipeRequest;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeResponse;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -78,6 +80,7 @@ public class RecipeController {
                 .toList();
     }
 
+
     @GetMapping("/{id}")
     @Operation(summary = "Obtener el detalle de una receta",
             description = "Devuelve la información completa de una receta, incluyendo su lista de ingredientes y cantidades.")
@@ -120,7 +123,7 @@ public class RecipeController {
             )
     })
     public RecipeDetailsResponse findById(@PathVariable Long id) {
-        
+
         Recipe recipe = service.findById(id);
 
         return RecipeDetailsResponse.fromEntity(recipe);
@@ -169,6 +172,49 @@ public class RecipeController {
 
         return service.findAll(pageable)
                 .map(RecipeResponse::fromEntity);
+    @PutMapping("/edit/{id}")
+    @Operation(summary = "Editar una receta existente",
+            description = "Actualiza los campos básicos de una receta. Los cambios se sincronizan automáticamente gracias al mecanismo de Dirty Checking de Hibernate.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Receta actualizada con éxito",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecipeDetailsResponse.class),
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "id": 1,
+                                        "title": "Pasta Carbonara Premium",
+                                        "description": "Versión mejorada",
+                                        "minutes": 20,
+                                        "difficulty": "MEDIUM",
+                                        "featured": false,
+                                        "authorName": "Chef Pro",
+                                        "ingredients": []
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Datos de entrada inválidos (error de validación)",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontró la receta con el ID proporcionado",
+                    content = @Content
+            )
+    })
+    public RecipeDetailsResponse edit(
+            @Parameter(description = "ID de la receta a editar", example = "1")
+            @PathVariable Long id,
+            @Valid @RequestBody RecipeRequest dto) {
+
+        Recipe recipe = dto.toEntity();
+        Recipe updatedRecipe = service.edit(id, recipe);
+        return RecipeDetailsResponse.fromEntity(updatedRecipe);
     }
 
 }

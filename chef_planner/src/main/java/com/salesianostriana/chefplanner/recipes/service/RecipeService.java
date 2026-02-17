@@ -18,7 +18,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class RecipeService {
     private final RecipeRepository repository;
-    private final UserRepository userRepository;
+                        private final UserRepository userRepository;
 
     @Transactional
     public Recipe save(Recipe recipe, Long authorId) {
