@@ -3,6 +3,7 @@ package com.salesianostriana.chefplanner.recipes.service;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeRequest;
 import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
+import com.salesianostriana.chefplanner.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,8 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class RecipeService {
     private final RecipeRepository repository;
-                        private final UserRepository userRepository;
+
+    private final UserRepository userRepository;
 
     @Transactional
     public Recipe save(Recipe recipe, Long authorId) {

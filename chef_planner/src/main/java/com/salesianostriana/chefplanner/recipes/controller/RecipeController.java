@@ -172,6 +172,8 @@ public class RecipeController {
 
         return service.findAll(pageable)
                 .map(RecipeResponse::fromEntity);
+    }
+
     @PutMapping("/edit/{id}")
     @Operation(summary = "Editar una receta existente",
             description = "Actualiza los campos básicos de una receta. Los cambios se sincronizan automáticamente gracias al mecanismo de Dirty Checking de Hibernate.")

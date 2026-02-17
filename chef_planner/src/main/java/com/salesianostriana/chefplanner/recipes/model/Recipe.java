@@ -1,6 +1,6 @@
 package com.salesianostriana.chefplanner.recipes.model;
 
-import com.salesianostriana.chefplanner.user.User;
+import com.salesianostriana.chefplanner.user.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -88,4 +88,6 @@ public class Recipe {
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
+
+
 }
