@@ -1,5 +1,6 @@
 package com.salesianostriana.chefplanner.security.auth;
 
+import com.salesianostriana.chefplanner.security.jwt.JwtAccessTokenService;
 import com.salesianostriana.chefplanner.user.UserRepository;
 import com.salesianostriana.chefplanner.user.dto.LoginRequest;
 import com.salesianostriana.chefplanner.user.dto.LoginResponse;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
-    //private final JwtAccessTokenService jwtAccessTokenService;
+    private final JwtAccessTokenService jwtAccessTokenService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 

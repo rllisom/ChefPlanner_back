@@ -1,6 +1,6 @@
 package com.salesianostriana.chefplanner.security.jwt;
 
-import com.salesianostriana.seguridad.user.model.User;
+import com.salesianostriana.chefplanner.user.model.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
