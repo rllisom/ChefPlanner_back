@@ -1,5 +1,6 @@
-package com.salesianostriana.chefplanner.model;
+package com.salesianostriana.chefplanner.menuitem.model;
 
+import com.salesianostriana.chefplanner.model.MealType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,13 +10,12 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "menu_item", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_user_date_mealtype", columnNames = {"user_id", "date", "meal_type"})
-})
+@Table(name = "menu_item")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class MenuItem {
 
     @Id
