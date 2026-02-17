@@ -27,7 +27,7 @@ public class Ingredient {
 
     String name;
 
-    @OneToMany()
+    @OneToMany(mappedBy = "ingredient")
     @ToString.Exclude
     @Builder.Default
     private Set<RecipeIngredient> recipeIngredients = new HashSet<>();

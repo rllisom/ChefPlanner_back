@@ -31,11 +31,6 @@ public class RecipeController {
     private final RecipeService service;
 
 
-
-
-
-
-
     @GetMapping("/buscar")
     @Operation(summary = "Buscar recetas por texto",
             description = "Filtra las recetas cuyo título o descripción coincidan con el término proporcionado.")
@@ -122,7 +117,6 @@ public class RecipeController {
     public RecipeDetailsResponse findById(@PathVariable Long id) {
         
         Recipe recipe = service.findById(id);
-
         return RecipeDetailsResponse.fromEntity(recipe);
     }
 

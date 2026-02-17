@@ -1,7 +1,11 @@
 package com.salesianostriana.chefplanner.recipeingredient.model;
 
+import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
+import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -21,6 +25,14 @@ public class RecipeIngredient {
 
     private int quantity;
     private String unit;
+
+    @ManyToOne
+    @JoinColumn(name = "recipe_id")
+    private Recipe recipe;
+
+    @ManyToOne
+    @JoinColumn(name = "ingredient_id")
+    private Ingredient ingredient;
 
     @Override
     public final boolean equals(Object o) {
