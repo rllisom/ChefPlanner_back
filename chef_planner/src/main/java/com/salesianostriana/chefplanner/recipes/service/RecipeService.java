@@ -1,5 +1,6 @@
 package com.salesianostriana.chefplanner.recipes.service;
 
+import com.salesianostriana.chefplanner.recipes.Dto.RecipeRequest;
 import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,20 +21,9 @@ public class RecipeService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Recipe save(RecipeRequest dto, Long authorId) {
+    public Recipe save(Recipe recipe, Long authorId) {
 
-        //  User author = userRepository.getReferenceById(authorId);
-
-        Recipe recipe = Recipe.builder()
-                .title(dto.title())
-                .description(dto.description())
-                .minutes(Duration.ofMinutes(dto.minutes()))
-                .difficulty(dto.difficulty())
-                .author(author)
-                .featured(false)
-                .build();
-
-
+        recipe.setAuthor(userRepository.getReferenceById(authorId));
 
         return repository.save(recipe);
     }
@@ -52,15 +42,18 @@ public class RecipeService {
     }
 
     @Transactional
-    public Recipe edit(Long id, RecipeRequest dto) {
-        Recipe recipe = findById(id);
+    public Recipe edit(Long id, Recipe recipe) {
 
-        recipe.setTitle(dto.title());
-        recipe.setDescription(dto.description());
-        recipe.setMinutes(Duration.ofMinutes(dto.minutes()));
-        recipe.setDifficulty(dto.difficulty());
+        Recipe originalRecipe = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Receta no encontrada"));
 
-        return recipe;
+        originalRecipe.setTitle(recipe.getTitle());
+        originalRecipe.setDescription(recipe.getDescription());
+        originalRecipe.setMinutes(recipe.getMinutes());
+        originalRecipe.setDifficulty(recipe.getDifficulty());
+
+        return originalRecipe;
+
     }
 
     @Transactional

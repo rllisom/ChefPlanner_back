@@ -37,6 +37,7 @@ public class Recipe {
     @JdbcTypeCode(SqlTypes.INTERVAL_SECOND)
     private Duration minutes;
 
+
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
 
