@@ -23,6 +23,22 @@ public class RecipeIngredientService {
     private final RecipeService recipeService;
 
 
+
+    public RecipeIngredient addIngredientToRecipe(Long recipeId,RecipeIngredientRequest request){
+        Recipe recipe = recipeService.findById(recipeId);
+        Ingredient ingredient = ingredientRepository.findById(request.ingredientId()).orElseThrow(
+                () -> new IngredientNotFoundException(request.ingredientId()));
+        RecipeIngredient recipeIngredient = RecipeIngredient.builder()
+                .recipe(recipe)
+                .ingredient(ingredient)
+                .quantity(request.quantity())
+                .unit(request.unit())
+                .build();
+        recipe.addIngredient(recipeIngredient);
+        return recipeIngredientRepository.save(recipeIngredient);
+    }
+
+
     public void eliminarIngredienteDeReceta(Long recetaid, Long ingredienteid) {
         List<RecipeIngredient> ingredientes = recipeIngredientRepository.findByIdRecipeId(recetaid);
         Recipe recipe = recipeService.findById(recetaid);
