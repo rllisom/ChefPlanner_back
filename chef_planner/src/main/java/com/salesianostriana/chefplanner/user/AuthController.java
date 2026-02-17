@@ -15,10 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "Endpoints para registro y login de usuarios")
 public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(
+            summary = "Login de usuario",
+            description = "Autentica credenciales y devuelve un token JWT para acceder al resto de la API."
+    )
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> doLogin(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity
@@ -26,6 +31,10 @@ public class AuthController {
                 .body(authService.doLogin(loginRequest));
     }
 
+    @Operation(
+            summary = "Registro de usuario",
+            description = "Crea un nuevo usuario en el sistema con email, username y contraseña."
+    )
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest) {
         return ResponseEntity
