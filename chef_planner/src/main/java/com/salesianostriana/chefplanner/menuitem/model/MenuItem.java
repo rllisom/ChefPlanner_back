@@ -1,21 +1,22 @@
-package com.salesianostriana.chefplanner.model;
+package com.salesianostriana.chefplanner.menuitem.model;
 
+import com.salesianostriana.chefplanner.menuitem.model.MealType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import org.apache.catalina.User;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
-@Table(name = "menu_item", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_user_date_mealtype", columnNames = {"user_id", "date", "meal_type"})
-})
+@Table(name = "menu_item")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class MenuItem {
 
     @Id
@@ -31,7 +32,7 @@ public class MenuItem {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "meal_type", nullable = false)
-    private MealType mealType;
+    private Set<MealType> mealType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
