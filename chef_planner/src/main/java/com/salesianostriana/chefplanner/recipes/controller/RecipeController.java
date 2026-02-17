@@ -1,5 +1,6 @@
 package com.salesianostriana.chefplanner.recipes.controller;
 
+import com.salesianostriana.chefplanner.recipes.Dto.RecipeDetailsResponse;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeResponse;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
@@ -15,10 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -78,6 +76,54 @@ public class RecipeController {
         return service.searchRecipesText(term).stream()
                 .map(RecipeResponse::fromEntity)
                 .toList();
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener el detalle de una receta",
+            description = "Devuelve la información completa de una receta, incluyendo su lista de ingredientes y cantidades.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Receta encontrada con éxito",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecipeDetailsResponse.class),
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "id": 1,
+                                        "title": "Pasta Carbonara Tradicional",
+                                        "description": "Una receta clásica italiana...",
+                                        "minutes": 15,
+                                        "difficulty": "MEDIUM",
+                                        "featured": true,
+                                        "authorName": "Juan Pérez",
+                                        "ingredients": [
+                                            {
+                                                "name": "Espaguetis",
+                                                "quantity": 200.0,
+                                                "unit": "g"
+                                            },
+                                            {
+                                                "name": "Guanciale",
+                                                "quantity": 100.0,
+                                                "unit": "g"
+                                            }
+                                        ]
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "La receta solicitada no existe",
+                    content = @Content
+            )
+    })
+    public RecipeDetailsResponse findById(@PathVariable Long id) {
+        
+        Recipe recipe = service.findById(id);
+
+        return RecipeDetailsResponse.fromEntity(recipe);
     }
 
 }
