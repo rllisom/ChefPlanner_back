@@ -1,11 +1,17 @@
 package com.salesianostriana.chefplanner.recipeingredient.model;
 
 import jakarta.persistence.Embeddable;
+import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class RecipeIngredientId implements Serializable {
 
