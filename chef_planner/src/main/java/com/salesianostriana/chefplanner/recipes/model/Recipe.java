@@ -1,6 +1,7 @@
 package com.salesianostriana.chefplanner.recipes.model;
 
-import com.salesianostriana.chefplanner.user.User;
+// TODO: Uncomment when User entity is implemented
+// import com.salesianostriana.chefplanner.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,8 +12,9 @@ import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+// TODO: Uncomment when RecipeIngredient entity is implemented
+// import java.util.ArrayList;
+// import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -40,11 +42,12 @@ public class Recipe {
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
 
-
+    // TODO: Uncomment when User entity is implemented
+    /*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User author;
-
+    */
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -52,14 +55,16 @@ public class Recipe {
 
     private String coverFileType;
 
+    @Builder.Default
     @Column(nullable = false)
     @ColumnDefault("false")
     private boolean featured = false;
 
+    // TODO: Uncomment when RecipeIngredient entity is implemented
+    /*
     @Builder.Default
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecipeIngredient> ingredients = new ArrayList<>();
-
 
     public void addIngredient(RecipeIngredient ingredient) {
         ingredients.add(ingredient);
@@ -70,6 +75,7 @@ public class Recipe {
         ingredients.remove(ingredient);
         ingredient.setRecipe(null);
     }
+    */
 
 
     @Override

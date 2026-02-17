@@ -9,20 +9,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.util.List;
+// TODO: Uncomment when RecipeRequest DTO is implemented
+// import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RecipeService {
     private final RecipeRepository repository;
-    private final UserRepository userRepository;
+    // TODO: Add UserRepository when User entity is implemented
+    // private final UserRepository userRepository;
 
+    // TODO: Implement when RecipeRequest DTO and User entity are available
+    /*
     @Transactional
     public Recipe save(RecipeRequest dto, Long authorId) {
-
-        //  User author = userRepository.getReferenceById(authorId);
+        User author = userRepository.getReferenceById(authorId);
 
         Recipe recipe = Recipe.builder()
                 .title(dto.title())
@@ -33,24 +35,28 @@ public class RecipeService {
                 .featured(false)
                 .build();
 
-
-
         return repository.save(recipe);
     }
+    */
 
     public Page<Recipe> findAll(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
+    // TODO: Uncomment when User entity is implemented
+    /*
     public Page<Recipe> findMyRecipes(Long authorId, Pageable pageable) {
         return repository.findByAuthorId(authorId, pageable);
     }
+    */
 
     public Recipe findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Receta no encontrada"));
     }
 
+    // TODO: Implement when RecipeRequest DTO is available
+    /*
     @Transactional
     public Recipe edit(Long id, RecipeRequest dto) {
         Recipe recipe = findById(id);
@@ -62,6 +68,7 @@ public class RecipeService {
 
         return recipe;
     }
+    */
 
     @Transactional
     public void deleteById(Long id) {

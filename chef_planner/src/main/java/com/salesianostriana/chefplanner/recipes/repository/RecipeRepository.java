@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
-    Page<Recipe> findByAuthorId(Long authorId, Pageable pageable);
+    // TODO: Uncomment when User entity is implemented
+    // Page<Recipe> findByAuthorId(Long authorId, Pageable pageable);
 
     @Transactional(readOnly = true)
     @Query("SELECT r" +
