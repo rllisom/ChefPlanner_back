@@ -32,6 +32,7 @@ public class Ingredient {
     @Builder.Default
     private Set<RecipeIngredient> recipeIngredients = new HashSet<>();
 
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
