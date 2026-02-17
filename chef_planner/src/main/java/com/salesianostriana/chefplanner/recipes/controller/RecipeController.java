@@ -130,6 +130,48 @@ public class RecipeController {
     }
 
 
+    @GetMapping
+    @Operation(summary = "Endpoint para obtener todas las recetas paginadas",
+            description = "Devuelve una página de recetas con información básica. " +
+                    "Se pueden usar los parámetros 'page', 'size' y 'sort' en la URL.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Se han encontrado recetas",
+                    content = @Content(
+                            mediaType = "application/json",
+                            
+                            array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class)),
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "content": [
+                                            {
+                                                "id": 1,
+                                                "title": "Pasta Carbonara",
+                                                "minutes": 15,
+                                                "difficulty": "EASY",
+                                                "featured": true,
+                                                "authorName": "Chef Pro"
+                                            }
+                                        ],
+                                        "page": {
+                                            "size": 20,
+                                            "totalElements": 1,
+                                            "totalPages": 1,
+                                            "number": 0
+                                        }
+                                    }
+                                    """)
+                    )
+            )
+    })
+    public Page<RecipeResponse> findAll(
+            @Parameter(description = "Configuración de paginación (page, size, sort)",
+                    example = "page=0&size=10&sort=title,asc")
+            Pageable pageable) {
+
+        return service.findAll(pageable)
+                .map(RecipeResponse::fromEntity);
     @PutMapping("/edit/{id}")
     @Operation(summary = "Editar una receta existente",
             description = "Actualiza los campos básicos de una receta. Los cambios se sincronizan automáticamente gracias al mecanismo de Dirty Checking de Hibernate.")
