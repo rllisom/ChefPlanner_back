@@ -25,6 +25,8 @@ public class Ingredient {
     @GeneratedValue
     private Long id;
 
+    String name;
+
     @OneToMany()
     @ToString.Exclude
     @Builder.Default
