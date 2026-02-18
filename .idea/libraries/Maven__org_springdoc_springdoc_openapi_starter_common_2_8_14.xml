@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Maven: org.springdoc:springdoc-openapi-starter-common:2.8.14" type="java-imported" external-system-id="Maven">
+    <properties groupId="org.springdoc" artifactId="springdoc-openapi-starter-common" version="2.8.14" baseVersion="2.8.14" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-common/2.8.14/springdoc-openapi-starter-common-2.8.14.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-common/2.8.14/springdoc-openapi-starter-common-2.8.14-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-starter-common/2.8.14/springdoc-openapi-starter-common-2.8.14-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
