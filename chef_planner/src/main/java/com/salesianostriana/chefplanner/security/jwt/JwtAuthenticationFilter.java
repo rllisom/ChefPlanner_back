@@ -1,5 +1,6 @@
 package com.salesianostriana.chefplanner.security.jwt;
 
+import com.salesianostriana.chefplanner.user.UserRepository;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
