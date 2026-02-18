@@ -5,6 +5,8 @@ import com.salesianostriana.chefplanner.user.dto.LoginRequest;
 import com.salesianostriana.chefplanner.user.dto.LoginResponse;
 import com.salesianostriana.chefplanner.user.dto.RegisterRequest;
 import com.salesianostriana.chefplanner.user.dto.RegisterResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

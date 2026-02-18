@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class RecipeService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Recipe save(Recipe recipe, Long authorId) {
+    public Recipe save(Recipe recipe, UUID authorId) {
 
         recipe.setAuthor(userRepository.getReferenceById(authorId));
 

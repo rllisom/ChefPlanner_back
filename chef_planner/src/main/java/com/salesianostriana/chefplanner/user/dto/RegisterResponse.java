@@ -1,7 +1,7 @@
 package com.salesianostriana.chefplanner.user.dto;
 
 public record RegisterResponse(
-        Long id,
+        java.util.UUID id,
         String email,
         String username) {
 }

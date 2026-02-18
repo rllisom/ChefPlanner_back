@@ -1,6 +1,9 @@
 package com.salesianostriana.chefplanner.security;
 
+import com.salesianostriana.chefplanner.security.error.JwtAccessDeniedHandler;
+import com.salesianostriana.chefplanner.security.error.JwtAuthenticationEntryPoint;
 import com.salesianostriana.chefplanner.security.jwt.JwtAuthenticationFilter;
+import com.salesianostriana.chefplanner.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,7 +54,7 @@ public class SecurityConfig {
                     source.registerCorsConfiguration("/**", configuration);
                     corsConf.configurationSource(source);
                 })
-                ..exceptionHandling(excepz ->
+                .exceptionHandling(excepz ->
                 excepz
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                         .accessDeniedHandler(jwtAccessDeniedHandler)

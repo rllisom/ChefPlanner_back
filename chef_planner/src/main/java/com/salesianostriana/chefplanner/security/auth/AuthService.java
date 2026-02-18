@@ -1,5 +1,6 @@
 package com.salesianostriana.chefplanner.security.auth;
 
+import com.salesianostriana.chefplanner.security.jwt.JwtAccessTokenService;
 import com.salesianostriana.chefplanner.user.UserRepository;
 import com.salesianostriana.chefplanner.user.dto.LoginRequest;
 import com.salesianostriana.chefplanner.user.dto.LoginResponse;
@@ -60,7 +61,7 @@ public class AuthService {
                         "User not found: " + loginRequest.username()
                 ));
 
-        String token = jwtAccessTokenService.generateAccessToken(user);
+        String token = JwtAccessTokenService.generateAccessToken(user);
 
         return new LoginResponse(
                 user.getUsername(),
