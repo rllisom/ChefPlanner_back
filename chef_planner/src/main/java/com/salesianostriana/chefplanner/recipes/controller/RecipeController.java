@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -255,7 +256,7 @@ public class RecipeController {
     public ResponseEntity<RecipeDetailsResponse> save(
             @Valid @RequestBody RecipeRequest recipeRequest,
             @Parameter(description = "ID del autor de la receta", example = "1")
-            @RequestParam Long authorId) {
+            @RequestParam UUID authorId) {
 
         Recipe recipe = recipeRequest.toEntity();
         Recipe savedRecipe = service.save(recipe, authorId);
