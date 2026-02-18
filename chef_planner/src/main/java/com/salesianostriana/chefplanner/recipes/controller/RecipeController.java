@@ -10,6 +10,7 @@ import com.salesianostriana.chefplanner.recipes.service.RecipeService;
 import com.salesianostriana.chefplanner.user.model.User;
 import com.salesianostriana.chefplanner.user.repository.UserRepository;
 import com.salesianostriana.chefplanner.user.service.AuthService;
+import com.salesianostriana.chefplanner.user.service.CustomUserDetailsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -42,7 +43,7 @@ import java.util.UUID;
 public class RecipeController {
 
     private final RecipeService service;
-    private final UserRepository userRepository;
+    private final CustomUserDetailsService customUserDetailsService;
 
 
 
@@ -81,13 +82,20 @@ public class RecipeController {
     })
     public List<RecipeResponse> search(
             @Parameter(description = "Término de búsqueda (título o descripción)", example = "pasta")
-            @RequestParam(name = "s") String term,
-            @AuthenticationPrincipal UserDetails userDetails
+            @RequestParam(name = "s") String term) {
 
-            ) {
-        String username = userDetails != null ? userDetails.getUsername() : "Anónimo";
         return service.searchRecipesText(term).stream()
-                .map(recipe -> RecipeResponse.fromEntity(recipe, username))
+                .map(recipe -> {
+
+                    String authorUuidStr = recipe.getAuthor().getUserUuid();
+
+                    String authorUsername = customUserDetailsService.findById(UUID.fromString(authorUuidStr))
+                            .map(User::getUsername)
+                            .orElse("Usuario Desconocido");
+
+                    return RecipeResponse.fromEntity(recipe, authorUsername); // Se lo tengo que seguir pasando porque en recipe no tengo un String nombre usuario y si no no se lo podemos pasar
+
+                })
                 .toList();
     }
 
@@ -179,12 +187,20 @@ public class RecipeController {
     public Page<RecipeResponse> findAll(
             @Parameter(description = "Configuración de paginación (page, size, sort)",
                     example = "page=0&size=10&sort=title,asc")
-            Pageable pageable,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            Pageable pageable) {
 
-        String username = userDetails != null ? userDetails.getUsername() : "Anónimo";
-        return service.findAll(pageable)
-                .map(recipe -> RecipeResponse.fromEntity(recipe, username));
+        Page<Recipe> recipes = service.findAll(pageable);
+
+        return recipes.map(recipe -> {
+
+            String authorUuidStr = recipe.getAuthor().getUserUuid();
+
+            String authorUsername = customUserDetailsService.findById(UUID.fromString(authorUuidStr))
+                    .map(User::getUsername)
+                    .orElse("Usuario Desconocido");
+
+            return RecipeResponse.fromEntity(recipe, authorUsername);
+        });
     }
 
     @PutMapping("/edit/{id}")
