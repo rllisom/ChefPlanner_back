@@ -3,6 +3,8 @@ package com.salesianostriana.chefplanner.recipes.controller;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeDetailsResponse;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeRequest;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeResponse;
+import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
+import com.salesianostriana.chefplanner.recipes.model.Difficulty;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
@@ -288,6 +291,26 @@ public class RecipeController {
         service.deleteById(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/filter")
+    @Operation(summary = "Filtrado avanzado con DTO",
+            description = "Recibe un objeto con múltiples criterios de búsqueda opcionales.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Resultados obtenidos satisfactoriamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class))
+                    )
+            )
+    })
+    public List<RecipeResponse> filter(RecipeSearchRequest search) {
+
+        return service.buscarRecetasConDTO(search).stream()
+                .map(RecipeResponse::fromEntity)
+                .toList();
     }
 
 
