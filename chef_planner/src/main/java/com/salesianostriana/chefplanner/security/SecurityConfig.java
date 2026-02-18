@@ -3,7 +3,7 @@ package com.salesianostriana.chefplanner.security;
 import com.salesianostriana.chefplanner.security.error.JwtAccessDeniedHandler;
 import com.salesianostriana.chefplanner.security.error.JwtAuthenticationEntryPoint;
 import com.salesianostriana.chefplanner.security.jwt.JwtAuthenticationFilter;
-import com.salesianostriana.chefplanner.user.UserRepository;
+import com.salesianostriana.chefplanner.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -22,4 +22,14 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
+        ProblemDetail problemDetail =  ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+
+        problemDetail.setTitle("Error en los argumentos");
+        problemDetail.setType(URI.create("chefplanner.com/error/no-encontrado"));
+
+        return problemDetail;
+    }
+
 }

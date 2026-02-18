@@ -2,6 +2,7 @@ package com.salesianostriana.chefplanner.recipes.model;
 
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
 import com.salesianostriana.chefplanner.user.model.User;
+import com.salesianostriana.chefplanner.user.model.UserProfile;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -45,7 +46,7 @@ public class Recipe {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
-    private User author;
+    private UserProfile author;
 
 
     @Lob

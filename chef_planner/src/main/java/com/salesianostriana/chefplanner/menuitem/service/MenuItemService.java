@@ -2,9 +2,16 @@ package com.salesianostriana.chefplanner.menuitem.service;
 
 import com.salesianostriana.chefplanner.menuitem.dto.MenuItemRequest;
 import com.salesianostriana.chefplanner.menuitem.dto.MenuItemResponse;
+import com.salesianostriana.chefplanner.menuitem.error.MenuItemNotFoundException;
 import com.salesianostriana.chefplanner.menuitem.model.MealType;
 import com.salesianostriana.chefplanner.menuitem.model.MenuItem;
-import com.salesianostriana.chefplanner.menuitem.repositorio.MenuItemRepositorio;
+import com.salesianostriana.chefplanner.menuitem.repository.MenuItemRepository;
+import com.salesianostriana.chefplanner.recipes.error.RecipeNotFoundException;
+import com.salesianostriana.chefplanner.recipes.model.Recipe;
+import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
+import com.salesianostriana.chefplanner.user.error.ProfileNotFoundException;
+import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
+import com.salesianostriana.chefplanner.user.model.UserProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,46 +23,44 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MenuItemService {
 
-    private final MenuItemRepositorio menuItemRepositorio;
+    private final MenuItemRepository menuItemRepository;
     private final RecipeRepository recipeRepository;
+    private final UserProfileRepository userProfileRepository;
 
-    public MenuItemResponse create(MenuItemRequest request) {
+    public MenuItem create(MenuItemRequest request) {
 
         Recipe recipe = recipeRepository.findById(request.recipeId())
-                .orElseThrow(() -> new RuntimeException("Receta no encontrada"));
+                .orElseThrow(() -> new RecipeNotFoundException("Receta no encontrada"));
 
-        boolean existe = menuItemRepositorio
+        UserProfile profile = userProfileRepository.findById(request.profile_Id()).orElseThrow(
+                () -> new ProfileNotFoundException(request.profile_Id())
+        );
+
+        boolean existe = menuItemRepository
                 .existsByDateAndMealType(request.date(), request.mealType());
 
         if (existe) {
-            throw new RuntimeException("Ya hay una receta planificada para ese día y tipo de comida");
+            throw new IllegalArgumentException("Ya hay una receta planificada para ese día y tipo de comida");
         }
 
-        MenuItem menuItem = new MenuItem();
-        menuItem.setDate(request.date());
-        menuItem.setMealType(request.mealType());
-        menuItem.setRecipe(recipe);
+        MenuItem menuItem = MenuItem.builder()
+                .date(request.date())
+                .mealType(request.mealType())
+                .recipe(recipe)
+                .profile(profile)
+                .build();
 
-        MenuItem guardado = menuItemRepositorio.save(menuItem);
-
-        return toResponse(guardado);
+        return menuItemRepository.save(menuItem);
     }
 
-    public List<MenuItemResponse> getByRange(LocalDate startDate,
+    public List<MenuItem> getByRange(LocalDate startDate,
                                              LocalDate endDate) {
-
         if (startDate == null || endDate == null || endDate.isBefore(startDate)) {
-            throw new RuntimeException("Rango de fechas no válido");
+            throw new IllegalArgumentException("Rango de fechas no válido");
         }
-
-        List<MenuItem> items = menuItemRepositorio
+        List<MenuItem> items = menuItemRepository
                 .findByDateBetweenOrderByDateAscMealTypeAsc(startDate, endDate);
-
-        List<MenuItemResponse> result = new ArrayList<>();
-        for (MenuItem item : items) {
-            result.add(toResponse(item));
-        }
-        return result;
+        return items;
     }
 
     public void delete(LocalDate date, MealType mealType) {
@@ -64,20 +69,10 @@ public class MenuItemService {
             throw new RuntimeException("Datos de borrado no válidos");
         }
 
-        MenuItem item = menuItemRepositorio
+        MenuItem item = menuItemRepository
                 .findByDateAndMealType(date, mealType)
-                .orElseThrow(() -> new RuntimeException("No existe planificación para esa fecha y tipo"));
+                .orElseThrow(() -> new MenuItemNotFoundException("No existe planificación para esa fecha y tipo"));
 
-        menuItemRepositorio.delete(item);
-    }
-
-    private MenuItemResponse toResponse(MenuItem menuItem) {
-        return new MenuItemResponse(
-                menuItem.getId(),
-                menuItem.getDate(),
-                menuItem.getMealType(),
-                menuItem.getRecipe().getId(),
-                menuItem.getRecipe().getTitle()
-        );
+        menuItemRepository.delete(item);
     }
 }

@@ -1,7 +1,7 @@
-package com.salesianostriana.chefplanner.security.auth;
+package com.salesianostriana.chefplanner.user.service;
 
 import com.salesianostriana.chefplanner.security.jwt.JwtAccessTokenService;
-import com.salesianostriana.chefplanner.user.UserRepository;
+import com.salesianostriana.chefplanner.user.repository.UserRepository;
 import com.salesianostriana.chefplanner.user.dto.LoginRequest;
 import com.salesianostriana.chefplanner.user.dto.LoginResponse;
 import com.salesianostriana.chefplanner.user.dto.RegisterRequest;

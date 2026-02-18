@@ -1,6 +1,6 @@
-package com.salesianostriana.chefplanner.user;
+package com.salesianostriana.chefplanner.user.controller;
 
-import com.salesianostriana.chefplanner.security.auth.AuthService;
+import com.salesianostriana.chefplanner.user.service.AuthService;
 import com.salesianostriana.chefplanner.user.dto.LoginRequest;
 import com.salesianostriana.chefplanner.user.dto.LoginResponse;
 import com.salesianostriana.chefplanner.user.dto.RegisterRequest;
