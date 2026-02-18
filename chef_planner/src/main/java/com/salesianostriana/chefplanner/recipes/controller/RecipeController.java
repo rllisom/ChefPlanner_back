@@ -314,6 +314,33 @@ public class RecipeController {
     }
 
 
+    @PutMapping("/{id}/toggle-featured")
+    @Operation(summary = "Alternar estado destacado de una receta",
+            description = "Recupera la receta por su ID y delega al servicio la alternancia del campo 'featured'. " +
+                    "Hibernate detectará el cambio automáticamente gracias al Dirty Checking.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "El estado destacado se ha alterado correctamente",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se ha encontrado la receta con el ID proporcionado",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<Void> toggleFeatured(
+            @Parameter(description = "ID de la receta a destacar/quitar de destacados", example = "1")
+            @PathVariable Long id) {
+
+        Recipe recipe = service.findById(id);
+
+        service.toggleFeatured(recipe);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
 
 

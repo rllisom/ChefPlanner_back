@@ -46,6 +46,12 @@ public class RecipeService {
     }
 
 
+
+    @Transactional
+    public void toggleFeatured(Recipe recipe) {
+        recipe.setFeatured(!recipe.isFeatured());
+
+    }
     //filtro
     public List<Recipe> buscarRecetasConDTO(RecipeSearchRequest search) {
 
