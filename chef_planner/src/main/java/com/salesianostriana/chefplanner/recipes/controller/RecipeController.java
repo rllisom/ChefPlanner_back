@@ -1,0 +1,123 @@
+package com.salesianostriana.chefplanner.recipes.controller;
+
+import com.salesianostriana.chefplanner.recipes.Dto.RecipeDetailsResponse;
+import com.salesianostriana.chefplanner.recipes.Dto.RecipeResponse;
+import com.salesianostriana.chefplanner.recipes.model.Recipe;
+import com.salesianostriana.chefplanner.recipes.service.RecipeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+
+@RestController
+@RequestMapping("api/v1/recipes")
+@RequiredArgsConstructor
+@Tag(name = "Recetas", description = "Gestión de recetas de cocina")
+
+public class RecipeController {
+
+    private final RecipeService service;
+
+
+    @GetMapping("/buscar")
+    @Operation(summary = "Buscar recetas por texto",
+            description = "Filtra las recetas cuyo título o descripción coincidan con el término proporcionado.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Se han encontrado recetas",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class)),
+                            examples = @ExampleObject(value = """
+                                    [
+                                        {
+                                            "id": 1,
+                                            "title": "Pasta Carbonara Tradicional",
+                                            "minutes": 15,
+                                            "difficulty": "EASY",
+                                            "featured": true,
+                                            "authorName": "Juan Pérez"
+                                        },
+                                        {
+                                            "id": 5,
+                                            "title": "Ensalada César",
+                                            "minutes": 10,
+                                            "difficulty": "EASY",
+                                            "featured": false,
+                                            "authorName": "Ana García"
+                                        }
+                                    ]
+                                    """)
+                    )
+            )
+    })
+    public List<RecipeResponse> search(
+            @Parameter(description = "Término de búsqueda (título o descripción)", example = "pasta")
+            @RequestParam(name = "s") String term) {
+
+        return service.searchRecipesText(term).stream()
+                .map(RecipeResponse::fromEntity)
+                .toList();
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener el detalle de una receta",
+            description = "Devuelve la información completa de una receta, incluyendo su lista de ingredientes y cantidades.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Receta encontrada con éxito",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecipeDetailsResponse.class),
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "id": 1,
+                                        "title": "Pasta Carbonara Tradicional",
+                                        "description": "Una receta clásica italiana...",
+                                        "minutes": 15,
+                                        "difficulty": "MEDIUM",
+                                        "featured": true,
+                                        "authorName": "Juan Pérez",
+                                        "ingredients": [
+                                            {
+                                                "name": "Espaguetis",
+                                                "quantity": 200.0,
+                                                "unit": "g"
+                                            },
+                                            {
+                                                "name": "Guanciale",
+                                                "quantity": 100.0,
+                                                "unit": "g"
+                                            }
+                                        ]
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "La receta solicitada no existe",
+                    content = @Content
+            )
+    })
+    public RecipeDetailsResponse findById(@PathVariable Long id) {
+        
+        Recipe recipe = service.findById(id);
+        return RecipeDetailsResponse.fromEntity(recipe);
+    }
+
+}
