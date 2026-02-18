@@ -1,7 +1,10 @@
 package com.salesianostriana.chefplanner.recipes.Dto;
 
+import com.salesianostriana.chefplanner.recipeingredient.dto.RecipeIngredientResponse;
 import com.salesianostriana.chefplanner.recipes.model.Difficulty;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
+
+import java.util.List;
 
 public record RecipeDetailsResponse(
         String title,
@@ -10,7 +13,7 @@ public record RecipeDetailsResponse(
         Difficulty difficulty,
         boolean featured,
         String authorName,
-        List<IngredientResponse> ingredients
+        List<RecipeIngredientResponse> ingredients
 ){
     public static RecipeDetailsResponse fromEntity(Recipe recipe) {
         return new RecipeDetailsResponse(
@@ -21,7 +24,8 @@ public record RecipeDetailsResponse(
                 recipe.isFeatured(),
                 recipe.getAuthor() != null ? recipe.getAuthor().getUsername() : "Anónimo",
                 recipe.getIngredients().stream()
-                        .map(IngredientResponse::fromEntity)
+                        .map(RecipeIngredientResponse::of)
                         .toList()
         );
+    }
 }
