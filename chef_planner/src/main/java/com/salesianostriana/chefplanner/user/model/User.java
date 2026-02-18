@@ -36,6 +36,4 @@ public class User {
     private Set<UserRole> roles;
 
 
-
-
 }
