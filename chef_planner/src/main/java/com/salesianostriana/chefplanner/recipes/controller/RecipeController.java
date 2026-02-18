@@ -1,6 +1,7 @@
 package com.salesianostriana.chefplanner.recipes.controller;
 
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeDetailsResponse;
+import com.salesianostriana.chefplanner.recipes.Dto.RecipeRequest;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeResponse;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
@@ -13,12 +14,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -73,6 +78,7 @@ public class RecipeController {
                 .toList();
     }
 
+
     @GetMapping("/{id}")
     @Operation(summary = "Obtener el detalle de una receta",
             description = "Devuelve la información completa de una receta, incluyendo su lista de ingredientes y cantidades.")
@@ -115,9 +121,179 @@ public class RecipeController {
             )
     })
     public RecipeDetailsResponse findById(@PathVariable Long id) {
-        
+
         Recipe recipe = service.findById(id);
         return RecipeDetailsResponse.fromEntity(recipe);
     }
 
+
+    @GetMapping
+    @Operation(summary = "Endpoint para obtener todas las recetas paginadas",
+            description = "Devuelve una página de recetas con información básica. " +
+                    "Se pueden usar los parámetros 'page', 'size' y 'sort' en la URL.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Se han encontrado recetas",
+                    content = @Content(
+                            mediaType = "application/json",
+
+                            array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class)),
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "content": [
+                                            {
+                                                "id": 1,
+                                                "title": "Pasta Carbonara",
+                                                "minutes": 15,
+                                                "difficulty": "EASY",
+                                                "featured": true,
+                                                "authorName": "Chef Pro"
+                                            }
+                                        ],
+                                        "page": {
+                                            "size": 20,
+                                            "totalElements": 1,
+                                            "totalPages": 1,
+                                            "number": 0
+                                        }
+                                    }
+                                    """)
+                    )
+            )
+    })
+    public Page<RecipeResponse> findAll(
+            @Parameter(description = "Configuración de paginación (page, size, sort)",
+                    example = "page=0&size=10&sort=title,asc")
+            Pageable pageable) {
+
+        return service.findAll(pageable)
+                .map(RecipeResponse::fromEntity);
+    }
+
+    @PutMapping("/edit/{id}")
+    @Operation(summary = "Editar una receta existente",
+            description = "Actualiza los campos básicos de una receta. Los cambios se sincronizan automáticamente gracias al mecanismo de Dirty Checking de Hibernate.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Receta actualizada con éxito",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecipeDetailsResponse.class),
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "id": 1,
+                                        "title": "Pasta Carbonara Premium",
+                                        "description": "Versión mejorada",
+                                        "minutes": 20,
+                                        "difficulty": "MEDIUM",
+                                        "featured": false,
+                                        "authorName": "Chef Pro",
+                                        "ingredients": []
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Datos de entrada inválidos (error de validación)",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontró la receta con el ID proporcionado",
+                    content = @Content
+            )
+    })
+    public RecipeDetailsResponse edit(
+            @Parameter(description = "ID de la receta a editar", example = "1")
+            @PathVariable Long id,
+            @Valid @RequestBody RecipeRequest dto) {
+
+        Recipe recipe = dto.toEntity();
+        Recipe updatedRecipe = service.edit(id, recipe);
+        return RecipeDetailsResponse.fromEntity(updatedRecipe);
+    }
+
+    @PostMapping ("/crear")
+    @Operation(summary = "Endpoint para crear y guardar una nueva receta",
+            description = "Crea una receta a partir de los datos del cuerpo de la petición y la asocia a un autor existente. " +
+                    "Devuelve el detalle completo de la receta creada.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "La receta se ha creado correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecipeDetailsResponse.class),
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "id": 1,
+                                        "title": "Pasta Carbonara Tradicional",
+                                        "description": "Receta clásica con guanciale y pecorino",
+                                        "minutes": 15,
+                                        "difficulty": "EASY",
+                                        "featured": true,
+                                        "authorName": "Chef Pro",
+                                        "ingredients": [
+                                            {
+                                                "name": "Espaguetis",
+                                                "quantity": 200.0,
+                                                "unit": "g"
+                                            }
+                                        ]
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Los datos de la receta no son válidos",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<RecipeDetailsResponse> save(
+            @Valid @RequestBody RecipeRequest recipeRequest,
+            @Parameter(description = "ID del autor de la receta", example = "1")
+            @RequestParam UUID authorId) {
+
+        Recipe recipe = recipeRequest.toEntity();
+        Recipe savedRecipe = service.save(recipe, authorId);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(RecipeDetailsResponse.fromEntity(savedRecipe));
+    }
+
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar una receta",
+            description = "Elimina de forma permanente una receta y sus ingredientes asociados de la base de datos.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "La receta ha sido eliminada con éxito",
+                    content = @Content 
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se pudo eliminar: la receta no existe",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "ID de la receta a eliminar", example = "1")
+            @PathVariable Long id) {
+        service.deleteById(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
+
+
+
+
+

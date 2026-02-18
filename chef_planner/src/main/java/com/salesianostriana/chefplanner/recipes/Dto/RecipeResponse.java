@@ -16,10 +16,10 @@ public record RecipeResponse(
     public static RecipeResponse fromEntity(Recipe recipe) {
         return new RecipeResponse(
                 recipe.getTitle(),
-                recipe.getMinutes().toMinutes(),
+                recipe.getMinutes(),
                 recipe.getDifficulty(),
                 recipe.isFeatured(),
-                recipe.getAuthor() != null ? recipe.getAuthor().getName() : "Anónimo"
+                recipe.getAuthor() != null ? recipe.getAuthor().getUsername() : "Anónimo"
         );
     }
 }

@@ -1,7 +1,7 @@
 package com.salesianostriana.chefplanner.recipes.model;
 
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
-import com.salesianostriana.chefplanner.user.User;
+import com.salesianostriana.chefplanner.user.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

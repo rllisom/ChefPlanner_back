@@ -22,7 +22,7 @@ public record RecipeDetailsResponse(
                 (int) recipe.getMinutes().toMinutes(),
                 recipe.getDifficulty(),
                 recipe.isFeatured(),
-                recipe.getAuthor() != null ? recipe.getAuthor().getName() : "Anónimo",
+                recipe.getAuthor() != null ? recipe.getAuthor().getUsername() : "Anónimo",
                 recipe.getIngredients().stream()
                         .map(RecipeIngredientResponse::of)
                         .toList()
