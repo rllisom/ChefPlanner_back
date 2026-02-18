@@ -22,11 +22,11 @@ public class JwtAccessTokenService {
     private String jwtSecret;
 
     @Value("${jwt.duration}")
-    private static long jwtLifeInSeconds;
+    private long jwtLifeInSeconds;
 
     private JwtParser jwtParser;
 
-    private static SecretKey secretKey;
+    private SecretKey secretKey;
 
     @PostConstruct
     public void init() {
@@ -39,11 +39,11 @@ public class JwtAccessTokenService {
 
     }
 
-    public static String generateAccessToken(User user) {
+    public String generateAccessToken(User user) {
         return generateAccessToken(user.getId().toString());
     }
 
-    public static String generateAccessToken(String uuid) {
+    public String generateAccessToken(String uuid) {
         return Jwts.builder()
                 .header().setType(TOKEN_TYPE)
                 .and()

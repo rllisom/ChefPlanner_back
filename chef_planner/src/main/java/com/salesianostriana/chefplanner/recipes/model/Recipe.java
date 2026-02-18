@@ -25,7 +25,7 @@ import java.util.Objects;
 @Builder
 public class Recipe {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue()
     private Long id;
 
     @NotBlank

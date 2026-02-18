@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.data.annotation.CreatedBy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class UserProfile {
     @GeneratedValue()
     private Long id;
 
-
+    @CreatedBy
     @Column(nullable = false, unique = true)
     private String userUuid;
 
