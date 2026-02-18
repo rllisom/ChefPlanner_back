@@ -7,6 +7,7 @@ import com.salesianostriana.chefplanner.recipeingredient.dto.RecipeIngredientReq
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
 import com.salesianostriana.chefplanner.recipeingredient.repository.RecipeIngredientRepository;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
+import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class RecipeIngredientService {
 
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final IngredientRepository ingredientRepository;
+    private final RecipeRepository recipeRepository;
     private final RecipeService recipeService;
 
 
@@ -51,5 +53,9 @@ public class RecipeIngredientService {
                 break;
             }
         }
+    }
+
+    public void mostrarIngredientesRecetas(){
+
     }
 }
