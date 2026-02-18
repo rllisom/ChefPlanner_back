@@ -1,0 +1,7 @@
+package com.salesianostriana.chefplanner.user.repository;
+
+import com.salesianostriana.chefplanner.user.model.UserProfile;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserProfileRepository extends JpaRepository<UserProfile,Long> {
+}

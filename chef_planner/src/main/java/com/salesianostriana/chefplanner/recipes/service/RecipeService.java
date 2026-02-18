@@ -4,7 +4,9 @@ import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
 import com.salesianostriana.chefplanner.recipes.model.Difficulty;
 import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
-import com.salesianostriana.chefplanner.user.UserRepository;
+import com.salesianostriana.chefplanner.user.model.UserProfile;
+import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
+import com.salesianostriana.chefplanner.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,10 +24,10 @@ import java.util.UUID;
 public class RecipeService {
     private final RecipeRepository repository;
 
-    private final UserRepository userRepository;
+    private final UserProfileRepository userRepository;
 
     @Transactional
-    public Recipe save(Recipe recipe, UUID authorId) {
+    public Recipe save(Recipe recipe, Long authorId) {
 
         recipe.setAuthor(userRepository.getReferenceById(authorId));
 

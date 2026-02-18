@@ -6,6 +6,7 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -27,10 +28,12 @@ public class RecipeIngredient {
     private String unit;
 
     @ManyToOne
+    @MapsId("recipeId")
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
     @ManyToOne
+    @MapsId("ingredientId")
     @JoinColumn(name = "ingredient_id")
     private Ingredient ingredient;
 

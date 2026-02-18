@@ -7,6 +7,9 @@ import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
 import com.salesianostriana.chefplanner.recipes.model.Difficulty;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
+import com.salesianostriana.chefplanner.user.model.User;
+import com.salesianostriana.chefplanner.user.repository.UserRepository;
+import com.salesianostriana.chefplanner.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -22,6 +25,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -37,6 +42,8 @@ import java.util.UUID;
 public class RecipeController {
 
     private final RecipeService service;
+    private final UserRepository userRepository;
+
 
 
     @GetMapping("/buscar")
@@ -74,10 +81,13 @@ public class RecipeController {
     })
     public List<RecipeResponse> search(
             @Parameter(description = "Término de búsqueda (título o descripción)", example = "pasta")
-            @RequestParam(name = "s") String term) {
+            @RequestParam(name = "s") String term,
+            @AuthenticationPrincipal UserDetails userDetails
 
+            ) {
+        String username = userDetails != null ? userDetails.getUsername() : "Anónimo";
         return service.searchRecipesText(term).stream()
-                .map(RecipeResponse::fromEntity)
+                .map(recipe -> RecipeResponse.fromEntity(recipe, username))
                 .toList();
     }
 
@@ -123,10 +133,11 @@ public class RecipeController {
                     content = @Content
             )
     })
-    public RecipeDetailsResponse findById(@PathVariable Long id) {
+    public RecipeDetailsResponse findById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
 
         Recipe recipe = service.findById(id);
-        return RecipeDetailsResponse.fromEntity(recipe);
+        String username = userDetails != null ? userDetails.getUsername() : "Anónimo";
+        return RecipeDetailsResponse.fromEntity(recipe,username);
     }
 
 
@@ -168,10 +179,12 @@ public class RecipeController {
     public Page<RecipeResponse> findAll(
             @Parameter(description = "Configuración de paginación (page, size, sort)",
                     example = "page=0&size=10&sort=title,asc")
-            Pageable pageable) {
+            Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
+        String username = userDetails != null ? userDetails.getUsername() : "Anónimo";
         return service.findAll(pageable)
-                .map(RecipeResponse::fromEntity);
+                .map(recipe -> RecipeResponse.fromEntity(recipe, username));
     }
 
     @PutMapping("/edit/{id}")
@@ -212,11 +225,13 @@ public class RecipeController {
     public RecipeDetailsResponse edit(
             @Parameter(description = "ID de la receta a editar", example = "1")
             @PathVariable Long id,
-            @Valid @RequestBody RecipeRequest dto) {
+            @Valid @RequestBody RecipeRequest dto,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
         Recipe recipe = dto.toEntity();
+        String username = userDetails != null ? userDetails.getUsername() : "Anónimo";
         Recipe updatedRecipe = service.edit(id, recipe);
-        return RecipeDetailsResponse.fromEntity(updatedRecipe);
+        return RecipeDetailsResponse.fromEntity(updatedRecipe,username);
     }
 
     @PostMapping ("/crear")
@@ -259,14 +274,16 @@ public class RecipeController {
     public ResponseEntity<RecipeDetailsResponse> save(
             @Valid @RequestBody RecipeRequest recipeRequest,
             @Parameter(description = "ID del autor de la receta", example = "1")
-            @RequestParam UUID authorId) {
+            @RequestParam Long authorId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
 
         Recipe recipe = recipeRequest.toEntity();
         Recipe savedRecipe = service.save(recipe, authorId);
-
+        String username = userDetails != null ? userDetails.getUsername() : "Anónimo";
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(RecipeDetailsResponse.fromEntity(savedRecipe));
+                .body(RecipeDetailsResponse.fromEntity(savedRecipe,username));
     }
 
 
@@ -342,8 +359,3 @@ public class RecipeController {
     }
 
 }
-
-
-
-
-
