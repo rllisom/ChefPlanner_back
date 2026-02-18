@@ -18,6 +18,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -134,7 +136,7 @@ public class RecipeController {
                     description = "Se han encontrado recetas",
                     content = @Content(
                             mediaType = "application/json",
-                            
+
                             array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class)),
                             examples = @ExampleObject(value = """
                                     {
@@ -213,4 +215,84 @@ public class RecipeController {
         return RecipeDetailsResponse.fromEntity(updatedRecipe);
     }
 
+    @PostMapping ("/crear")
+    @Operation(summary = "Endpoint para crear y guardar una nueva receta",
+            description = "Crea una receta a partir de los datos del cuerpo de la petición y la asocia a un autor existente. " +
+                    "Devuelve el detalle completo de la receta creada.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "La receta se ha creado correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecipeDetailsResponse.class),
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "id": 1,
+                                        "title": "Pasta Carbonara Tradicional",
+                                        "description": "Receta clásica con guanciale y pecorino",
+                                        "minutes": 15,
+                                        "difficulty": "EASY",
+                                        "featured": true,
+                                        "authorName": "Chef Pro",
+                                        "ingredients": [
+                                            {
+                                                "name": "Espaguetis",
+                                                "quantity": 200.0,
+                                                "unit": "g"
+                                            }
+                                        ]
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Los datos de la receta no son válidos",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<RecipeDetailsResponse> save(
+            @Valid @RequestBody RecipeRequest recipeRequest,
+            @Parameter(description = "ID del autor de la receta", example = "1")
+            @RequestParam Long authorId) {
+
+        Recipe recipe = recipeRequest.toEntity();
+        Recipe savedRecipe = service.save(recipe, authorId);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(RecipeDetailsResponse.fromEntity(savedRecipe));
+    }
+
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar una receta",
+            description = "Elimina de forma permanente una receta y sus ingredientes asociados de la base de datos.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "La receta ha sido eliminada con éxito",
+                    content = @Content 
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se pudo eliminar: la receta no existe",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "ID de la receta a eliminar", example = "1")
+            @PathVariable Long id) {
+        service.deleteById(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
+
+
+
+
+
