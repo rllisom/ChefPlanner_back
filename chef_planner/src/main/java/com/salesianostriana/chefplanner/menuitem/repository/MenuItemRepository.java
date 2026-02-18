@@ -1,4 +1,4 @@
-package com.salesianostriana.chefplanner.menuitem.repositorio;
+package com.salesianostriana.chefplanner.menuitem.repository;
 
 import com.salesianostriana.chefplanner.menuitem.model.MealType;
 import com.salesianostriana.chefplanner.menuitem.model.MenuItem;
@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface MenuItemRepositorio extends JpaRepository<MenuItem, Long> {
+public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
 
     boolean existsByDateAndMealType(LocalDate date, MealType mealType);
 

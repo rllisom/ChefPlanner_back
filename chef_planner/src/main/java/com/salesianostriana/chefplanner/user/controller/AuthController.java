@@ -1,6 +1,6 @@
-package com.salesianostriana.chefplanner.user;
+package com.salesianostriana.chefplanner.user.controller;
 
-import com.salesianostriana.chefplanner.security.auth.AuthService;
+import com.salesianostriana.chefplanner.user.service.AuthService;
 import com.salesianostriana.chefplanner.user.dto.LoginRequest;
 import com.salesianostriana.chefplanner.user.dto.LoginResponse;
 import com.salesianostriana.chefplanner.user.dto.RegisterRequest;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Endpoints para registro y login de usuarios")
 public class AuthController {

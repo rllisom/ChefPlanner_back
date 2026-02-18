@@ -1,6 +1,7 @@
 package com.salesianostriana.chefplanner.menuitem.dto;
 
 import com.salesianostriana.chefplanner.menuitem.model.MealType;
+import com.salesianostriana.chefplanner.menuitem.model.MenuItem;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -19,6 +20,20 @@ public record MenuItemResponse(
         Long recipeId,
 
         @Schema(description = "Título de la receta", example = "Pasta Carbonara")
-        String recipeTitle
+        String recipeTitle,
 
-) {}
+        @Schema(description = "ID del perfil que creó el menú", example = "3")
+        Long profileId
+
+) {
+    public static MenuItemResponse of(MenuItem menuItem) {
+        return new MenuItemResponse(
+                menuItem.getId(),
+                menuItem.getDate(),
+                menuItem.getMealType(),
+                menuItem.getRecipe().getId(),
+                menuItem.getRecipe().getTitle(),
+                menuItem.getProfile().getId()
+        );
+    }
+}

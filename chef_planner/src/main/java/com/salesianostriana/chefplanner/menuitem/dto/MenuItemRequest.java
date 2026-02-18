@@ -19,6 +19,10 @@ public record MenuItemRequest(
 
         @Schema(description = "ID de la receta asociada", example = "42")
         @NotNull(message = "La receta es obligatoria")
-        Long recipeId
+        Long recipeId,
+
+        @Schema(description = "ID del perfil que crea el menú", example = "3")
+        @NotNull(message = "El id del perfil es obligatorio")
+        Long profile_Id
 
 ) {}

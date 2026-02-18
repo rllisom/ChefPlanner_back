@@ -25,7 +25,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/v1/menuitems")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Menu", description = "Planificación del menú semanal (crear, listar, borrar)")
 @PreAuthorize("hasRole('USER')")
@@ -45,10 +45,9 @@ public class MenuItemController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class)))
     })
-    @PostMapping
+    @PostMapping("/menuitem")
     public ResponseEntity<MenuItemResponse> create(@Valid @RequestBody MenuItemRequest request) {
-        MenuItemResponse nuevo = menuItemService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(MenuItemResponse.of(menuItemService.create(request)));
     }
 
     @Operation(summary = "Obtener planificación entre dos fechas")
@@ -60,13 +59,16 @@ public class MenuItemController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class)))
     })
-    @GetMapping
+    @GetMapping("/menuitem")
     public ResponseEntity<List<MenuItemResponse>> getByRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
-        List<MenuItemResponse> items = menuItemService.getByRange(startDate, endDate);
-        return ResponseEntity.ok(items);
+
+        return ResponseEntity.ok(
+                menuItemService.getByRange(startDate,endDate).stream()
+                        .map(MenuItemResponse::of)
+                        .toList());
     }
 
     @Operation(summary = "Eliminar planificación de un día y tipo de comida")
@@ -79,9 +81,9 @@ public class MenuItemController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class)))
     })
-    @DeleteMapping
+    @DeleteMapping("/menuitem")
     public ResponseEntity<Void> delete(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam LocalDate date,
             @RequestParam MealType mealType) {
 
         menuItemService.delete(date, mealType);

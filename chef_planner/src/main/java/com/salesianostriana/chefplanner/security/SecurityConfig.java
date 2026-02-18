@@ -3,7 +3,7 @@ package com.salesianostriana.chefplanner.security;
 import com.salesianostriana.chefplanner.security.error.JwtAccessDeniedHandler;
 import com.salesianostriana.chefplanner.security.error.JwtAuthenticationEntryPoint;
 import com.salesianostriana.chefplanner.security.jwt.JwtAuthenticationFilter;
-import com.salesianostriana.chefplanner.user.UserRepository;
+import com.salesianostriana.chefplanner.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,8 +62,9 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(
                 auth -> auth
-                        .requestMatchers(HttpMethod.POST,"/api/v1/login").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/v1/register").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/auth/register").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
         );

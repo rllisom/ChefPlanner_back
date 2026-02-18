@@ -1,7 +1,7 @@
-package com.salesianostriana.chefplanner.security.auth;
+package com.salesianostriana.chefplanner.user.service;
 
 import com.salesianostriana.chefplanner.security.jwt.JwtAccessTokenService;
-import com.salesianostriana.chefplanner.user.UserRepository;
+import com.salesianostriana.chefplanner.user.repository.UserRepository;
 import com.salesianostriana.chefplanner.user.dto.LoginRequest;
 import com.salesianostriana.chefplanner.user.dto.LoginResponse;
 import com.salesianostriana.chefplanner.user.dto.RegisterRequest;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
-    //private final JwtAccessTokenService jwtAccessTokenService;
+    private final JwtAccessTokenService jwtAccessTokenService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -61,7 +61,7 @@ public class AuthService {
                         "User not found: " + loginRequest.username()
                 ));
 
-        String token = JwtAccessTokenService.generateAccessToken(user);
+        String token = jwtAccessTokenService.generateAccessToken(user);
 
         return new LoginResponse(
                 user.getUsername(),
@@ -69,4 +69,3 @@ public class AuthService {
         );
     }
 }
-

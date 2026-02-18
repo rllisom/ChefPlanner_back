@@ -1,4 +1,4 @@
-package com.salesianostriana.chefplanner.user;
+package com.salesianostriana.chefplanner.user.repository;
 
 import com.salesianostriana.chefplanner.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
