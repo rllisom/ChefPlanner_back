@@ -12,8 +12,7 @@ public interface MenuItemRepositorio extends JpaRepository<MenuItem, Long> {
 
     boolean existsByDateAndMealType(LocalDate date, MealType mealType);
 
-    List<MenuItem> findByDateBetweenOrderByDateAscMealTypeAsc(LocalDate startDate,
-                                                              LocalDate endDate);
+    List<MenuItem> findByDateBetweenOrderByDateAscMealTypeAsc(LocalDate startDate, LocalDate endDate);
 
     Optional<MenuItem> findByDateAndMealType(LocalDate date, MealType mealType);
 }
