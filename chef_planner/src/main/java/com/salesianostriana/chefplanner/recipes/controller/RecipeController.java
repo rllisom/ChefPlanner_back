@@ -19,8 +19,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -288,6 +290,45 @@ public class RecipeController {
         service.deleteById(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/{id}/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Subir la imagen de portada de una receta",
+            description = "Recibe un archivo de imagen y actualiza la información de la portada de la receta.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Imagen subida y receta actualizada con éxito",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecipeDetailsResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "El archivo enviado no es válido",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontró la receta con el ID proporcionado",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<RecipeDetailsResponse> uploadCover(
+            @Parameter(description = "ID de la receta", example = "1")
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) {
+
+        Recipe recipe = service.findById(id);
+
+        recipe.setCoverFileType(file.getContentType());
+        
+        Recipe updatedRecipe = service.saveDirectly(recipe);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(RecipeDetailsResponse.fromEntity(updatedRecipe));
     }
 
 
