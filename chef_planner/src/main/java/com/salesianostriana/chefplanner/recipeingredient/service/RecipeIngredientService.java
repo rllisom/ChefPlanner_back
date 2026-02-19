@@ -72,7 +72,7 @@ public class RecipeIngredientService {
                 .flatMap(List::stream)
                 .toList();
 
-        List<Ingredient> ingredientesEnDespensa = userProfile.getPantry().getIngredients();
+        List<Ingredient> ingredientesEnDespensa = userProfile.getPantryIngredients();
 
         for (RecipeIngredient ri : ingredientesQueNecesitaParaRecetas) {
             if (!ingredientesEnDespensa.contains(ri.getIngredient())) {
