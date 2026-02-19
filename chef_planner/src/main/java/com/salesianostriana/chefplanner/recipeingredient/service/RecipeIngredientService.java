@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -61,9 +62,9 @@ public class RecipeIngredientService {
         }
     }
 
-    public List<RecipeIngredient> mostrarIngredientesRecetas(Long idUser){
+    public List<RecipeIngredient> mostrarIngredientesRecetas(UUID idUser){
         List<RecipeIngredient> ingredientesReceta = new ArrayList<>();
-        UserProfile userProfile = userProfileRepository.findById(idUser).orElseThrow(
+        UserProfile userProfile = userProfileRepository.findByUserUuid(idUser.toString()).orElseThrow(
                 () -> new ProfileNotFoundException("Usuario no encontrado"));
 
 
