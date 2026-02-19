@@ -19,7 +19,9 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long>, JpaSpecif
             " WHERE r.featured = true")
     Page<Recipe> findFeaturedRecipes(Pageable pageable);
 
-    Page<Recipe> findByFeaturedTrue(Pageable pageable);
+
+
+
 
 
 }

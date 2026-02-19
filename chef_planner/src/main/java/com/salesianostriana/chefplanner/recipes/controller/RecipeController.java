@@ -91,7 +91,7 @@ public class RecipeController {
 
                     String authorUsername = customUserDetailsService.findById(UUID.fromString(authorUuidStr))
                             .map(User::getUsername)
-                            .orElse("Usuario Desconocido");
+                            .orElse("Usuario no encontrado");
 
                     return RecipeResponse.fromEntity(recipe, authorUsername); // Se lo tengo que seguir pasando porque en recipe no tengo un String nombre usuario y si no no se lo podemos pasar
 
@@ -197,7 +197,7 @@ public class RecipeController {
 
             String authorUsername = customUserDetailsService.findById(UUID.fromString(authorUuidStr))
                     .map(User::getUsername)
-                    .orElse("Usuario Desconocido");
+                    .orElse("Usuario no encontrado");
 
             return RecipeResponse.fromEntity(recipe, authorUsername);
         });
@@ -342,8 +342,47 @@ public class RecipeController {
     public List<RecipeResponse> filter(RecipeSearchRequest search) {
 
         return service.buscarRecetasConDTO(search).stream()
-                .map(RecipeResponse::fromEntity)
+                .map(recipe -> {
+                    String authorUuidStr = recipe.getAuthor().getUserUuid();
+                    String authorUsername = customUserDetailsService.findById(UUID.fromString(authorUuidStr))
+                            .map(User::getUsername)
+                            .orElse("Usuario no encontrado");
+                    return RecipeResponse.fromEntity(recipe, authorUsername);
+                })
                 .toList();
+    }
+
+
+    @GetMapping("/featured")
+    @Operation(summary = "Obtener recetas destacadas paginadas",
+            description = "Recupera una página de recetas marcadas como 'featured'. " +
+                    "El nombre del autor se resuelve de forma desacoplada consultando el módulo de usuarios.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Página de recetas destacadas recuperada con éxito",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class))
+            )
+    })
+    public Page<RecipeResponse> findByFeatured(
+            @Parameter(description = "Parámetros de paginación (page, size, sort)",
+                    example = "page=0&size=10")
+            Pageable pageable) {
+
+        Page<Recipe> featuredRecipes = service.findByFeatured(pageable);
+
+        return featuredRecipes.map(recipe -> {
+
+
+            String authorUuidStr = recipe.getAuthor().getUserUuid();
+
+            String authorUsername = customUserDetailsService.findById(UUID.fromString(authorUuidStr))
+                    .map(User::getUsername)
+                    .orElse("Usuario no encontrado");
+
+            return RecipeResponse.fromEntity(recipe, authorUsername);
+        });
     }
 
 
