@@ -40,6 +40,12 @@ public class UserProfile {
     @Builder.Default
     private List<MenuItem> menuItems = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_pantry_ingredients",
+            joinColumns = @JoinColumn(name = "user_profile_id"),
+            inverseJoinColumns = @JoinColumn(name = "ingredient_id")
+    )
     @Builder.Default
     private List<Ingredient> pantryIngredients = new ArrayList<>();
 

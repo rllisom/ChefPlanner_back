@@ -3,11 +3,13 @@ package com.salesianostriana.chefplanner.files.shared.utils;
 import com.salesianostriana.chefplanner.files.shared.exception.StorageException;
 import org.apache.tika.Tika;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URLConnection;
 
+@Component
 public class TikaMimeTypeDetector implements MimeTypeDetector{
 
     private Tika tika;
