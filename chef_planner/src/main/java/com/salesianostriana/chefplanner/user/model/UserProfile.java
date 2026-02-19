@@ -1,6 +1,7 @@
 package com.salesianostriana.chefplanner.user.model;
 
 
+import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
 import com.salesianostriana.chefplanner.menuitem.model.MenuItem;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import jakarta.persistence.*;
@@ -38,6 +39,9 @@ public class UserProfile {
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MenuItem> menuItems = new ArrayList<>();
+
+    @Builder.Default
+    private List<Ingredient> pantryIngredients = new ArrayList<>();
 
     @Override
     public final boolean equals(Object o) {
