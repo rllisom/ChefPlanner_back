@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter@Setter
+@Getter
+@Setter
 @Builder
 public class User implements UserDetails {
 
@@ -24,18 +25,18 @@ public class User implements UserDetails {
     @GeneratedValue()
     private UUID id;
 
-    @Column(nullable=false, unique=true)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable=false, unique=true)
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name="user_roles", joinColumns = @JoinColumn(name="user_id"))
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     private Set<UserRole> roles;
 
@@ -46,7 +47,33 @@ public class User implements UserDetails {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public String getPassword() {
+        return password;
+    }
 
+    @Override
+    public String getUsername() {
+        return username;
+    }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
