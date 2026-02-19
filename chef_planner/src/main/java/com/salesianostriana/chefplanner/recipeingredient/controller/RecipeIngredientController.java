@@ -1,7 +1,9 @@
 package com.salesianostriana.chefplanner.recipeingredient.controller;
 
+import com.salesianostriana.chefplanner.recipeingredient.dto.CompraRecipeIngredient;
 import com.salesianostriana.chefplanner.recipeingredient.dto.RecipeIngredientRequest;
 import com.salesianostriana.chefplanner.recipeingredient.dto.RecipeIngredientResponse;
+import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
 import com.salesianostriana.chefplanner.recipeingredient.service.RecipeIngredientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +18,9 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @RestControllerAdvice
 @RequestMapping("/api/v1")
@@ -25,6 +30,21 @@ public class RecipeIngredientController {
     private final RecipeIngredientService recipeIngredientService;
 
 
+    @GetMapping("/ingredient/shopping/basket/{userId}")
+    public ResponseEntity<List<CompraRecipeIngredient>> getShoppingBasket(@PathVariable Long userId) {
+        List<RecipeIngredient> list = recipeIngredientService.mostrarIngredientesRecetas(userId);
+
+        List<CompraRecipeIngredient> response = list.stream()
+                .collect(Collectors.groupingBy(
+                        ri -> ri.getIngredient().getName(),
+                        Collectors.summingInt(RecipeIngredient::getQuantity)
+                ))
+                .entrySet().stream()
+                .map(entry -> new CompraRecipeIngredient(entry.getKey(), entry.getValue()))
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
 
     @Operation(summary = "Añadir ingrediente a receta")
     @ApiResponses({
