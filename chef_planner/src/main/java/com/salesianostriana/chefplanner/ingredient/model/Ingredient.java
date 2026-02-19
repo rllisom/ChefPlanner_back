@@ -3,6 +3,7 @@ package com.salesianostriana.chefplanner.ingredient.model;
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.*;
@@ -22,7 +23,7 @@ import java.util.Set;
 public class Ingredient {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue()
     private Long id;
 
     String name;

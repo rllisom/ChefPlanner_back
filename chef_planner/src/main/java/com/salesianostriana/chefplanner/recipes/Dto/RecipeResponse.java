@@ -13,13 +13,13 @@ public record RecipeResponse(
         String authorName
 ) {
 
-    public static RecipeResponse fromEntity(Recipe recipe) {
+    public static RecipeResponse fromEntity(Recipe recipe,String username) {
         return new RecipeResponse(
                 recipe.getTitle(),
-                recipe.getMinutes().toMinutes(),
+                recipe.getMinutes(),
                 recipe.getDifficulty(),
                 recipe.isFeatured(),
-                recipe.getAuthor() != null ? recipe.getAuthor().getName() : "Anónimo"
+                username
         );
     }
 }

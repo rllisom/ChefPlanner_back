@@ -15,14 +15,14 @@ public record RecipeDetailsResponse(
         String authorName,
         List<RecipeIngredientResponse> ingredients
 ){
-    public static RecipeDetailsResponse fromEntity(Recipe recipe) {
+    public static RecipeDetailsResponse fromEntity(Recipe recipe, String username) {
         return new RecipeDetailsResponse(
                 recipe.getTitle(),
                 recipe.getDescription(),
                 (int) recipe.getMinutes().toMinutes(),
                 recipe.getDifficulty(),
                 recipe.isFeatured(),
-                recipe.getAuthor() != null ? recipe.getAuthor().getName() : "Anónimo",
+                username,
                 recipe.getIngredients().stream()
                         .map(RecipeIngredientResponse::of)
                         .toList()

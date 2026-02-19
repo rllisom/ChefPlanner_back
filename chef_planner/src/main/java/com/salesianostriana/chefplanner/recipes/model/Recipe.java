@@ -1,7 +1,8 @@
 package com.salesianostriana.chefplanner.recipes.model;
 
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
-import com.salesianostriana.chefplanner.user.User;
+import com.salesianostriana.chefplanner.user.model.User;
+import com.salesianostriana.chefplanner.user.model.UserProfile;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.type.SqlTypes;
+import org.springframework.data.jpa.domain.PredicateSpecification;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ import java.util.Objects;
 @Builder
 public class Recipe {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue()
     private Long id;
 
     @NotBlank
@@ -45,7 +47,7 @@ public class Recipe {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
-    private User author;
+    private UserProfile author;
 
 
     @Lob
@@ -89,4 +91,16 @@ public class Recipe {
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
+
+    public static class Specs{
+        public static PredicateSpecification<Recipe> dificultad(Difficulty difficulty) {
+            return (from, criteriaBuilder) ->
+                    difficulty == null ? null : criteriaBuilder.equal(from.get("difficulty"), difficulty);
+        }
+        public static PredicateSpecification<Recipe> tiempoMaximo(Duration maxTime) {
+            return (from, criteriaBuilder) ->
+                    maxTime == null ? null : criteriaBuilder.lessThanOrEqualTo(from.get("minutes"), maxTime);
+        }
+    }
+
 }
