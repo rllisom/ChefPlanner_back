@@ -84,4 +84,38 @@ public class FileController {
 
         return builder.body(resource);
     }
+
+    @PutMapping(value = "/{id}/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Subir o actualizar la imagen de portada de una receta",
+            description = "Recibe un archivo de imagen, extrae sus bytes y los almacena en el campo LOB de la base de datos.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Imagen de portada actualizada con éxito",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RecipeDetailsResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Archivo no válido"),
+            @ApiResponse(responseCode = "404", description = "Receta no encontrada")
+    })
+    public ResponseEntity<RecipeDetailsResponse> uploadCover(
+            @Parameter(description = "ID de la receta", example = "1")
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) throws IOException {
+
+        Recipe recipe = service.findById(id);
+
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        recipe.setCoverFileData(file.getBytes());
+        recipe.setCoverFileType(file.getContentType());
+
+        Recipe savedRecipe = service.saveDirectly(recipe);
+        String authorUsername = customUserDetailsService.findById(UUID.fromString(savedRecipe.getAuthor().getUserUuid()))
+                .map(User::getUsername)
+                .orElse("Usuario Desconocido");
+
+        return ResponseEntity.ok(RecipeDetailsResponse.fromEntity(savedRecipe, authorUsername));
+    }
 }
