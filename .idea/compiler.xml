@@ -12,9 +12,6 @@
         <module name="chef_planner" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="chef_planner" target="21" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
