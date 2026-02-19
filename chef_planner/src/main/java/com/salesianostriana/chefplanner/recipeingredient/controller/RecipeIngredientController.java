@@ -1,10 +1,13 @@
 package com.salesianostriana.chefplanner.recipeingredient.controller;
 
+import com.salesianostriana.chefplanner.recipeingredient.dto.CompraRecipeIngredient;
 import com.salesianostriana.chefplanner.recipeingredient.dto.RecipeIngredientRequest;
 import com.salesianostriana.chefplanner.recipeingredient.dto.RecipeIngredientResponse;
+import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
 import com.salesianostriana.chefplanner.recipeingredient.service.RecipeIngredientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,6 +19,9 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @RestControllerAdvice
 @RequestMapping("/api/v1")
@@ -25,6 +31,65 @@ public class RecipeIngredientController {
     private final RecipeIngredientService recipeIngredientService;
 
 
+    @Operation(
+            summary = "Obtener la cesta de la compra de un usuario",
+            description = "Devuelve la lista de ingredientes agrupados con la cantidad total necesaria para todas las recetas del usuario"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de ingredientes obtenida correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = CompraRecipeIngredient.class)),
+                            examples = @ExampleObject(
+                                    value = """
+                                        [
+                                            { "name": "Tomate", "totalQuantity": 5 },
+                                            { "name": "Harina", "totalQuantity": 200 },
+                                            { "name": "Huevo", "totalQuantity": 3 }
+                                        ]
+                                        """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se ha encontrado el usuario",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                        {
+                                            "detail": "No se ha encontrado el usuario con id 5",
+                                            "instance": "/api/v1/ingredient/shopping/basket/5",
+                                            "status": 404,
+                                            "title": "Entidad no encontrada",
+                                            "type": "chefplanner.com/error/no-encontrado"
+                                        }
+                                        """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/ingredient/shopping/basket/{userId}")
+    public ResponseEntity<List<CompraRecipeIngredient>> getShoppingBasket(
+            @Parameter(description = "ID del usuario", example = "1")
+            @PathVariable Long userId) {
+        List<RecipeIngredient> list = recipeIngredientService.mostrarIngredientesRecetas(userId);
+
+        List<CompraRecipeIngredient> response = list.stream()
+                .collect(Collectors.groupingBy(
+                        ri -> ri.getIngredient().getName(),
+                        Collectors.summingInt(RecipeIngredient::getQuantity)
+                ))
+                .entrySet().stream()
+                .map(entry -> new CompraRecipeIngredient(entry.getKey(), entry.getValue()))
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
 
     @Operation(summary = "Añadir ingrediente a receta")
     @ApiResponses({

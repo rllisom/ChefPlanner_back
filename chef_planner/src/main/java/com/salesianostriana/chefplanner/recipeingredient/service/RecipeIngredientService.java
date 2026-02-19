@@ -7,11 +7,17 @@ import com.salesianostriana.chefplanner.recipeingredient.dto.RecipeIngredientReq
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
 import com.salesianostriana.chefplanner.recipeingredient.repository.RecipeIngredientRepository;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
+import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
+import com.salesianostriana.chefplanner.user.error.ProfileNotFoundException;
+import com.salesianostriana.chefplanner.user.model.UserProfile;
+import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -20,7 +26,9 @@ public class RecipeIngredientService {
 
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final IngredientRepository ingredientRepository;
+    private final RecipeRepository recipeRepository;
     private final RecipeService recipeService;
+    private final UserProfileRepository userProfileRepository;
 
 
 
@@ -52,4 +60,36 @@ public class RecipeIngredientService {
             }
         }
     }
+
+    public List<RecipeIngredient> mostrarIngredientesRecetas(Long idUser){
+        List<RecipeIngredient> ingredientesReceta = new ArrayList<>();
+        UserProfile userProfile = userProfileRepository.findById(idUser).orElseThrow(
+                () -> new ProfileNotFoundException("Usuario no encontrado"));
+
+
+        List<RecipeIngredient> ingredientesQueNecesitaParaRecetas = userProfile.getRecipes().stream()
+                .map(Recipe::getIngredients)
+                .flatMap(List::stream)
+                .toList();
+
+        List<Ingredient> ingredientesEnDespensa = userProfile.getPantryIngredients();
+
+        for (RecipeIngredient ri : ingredientesQueNecesitaParaRecetas) {
+            if (!ingredientesEnDespensa.contains(ri.getIngredient())) {
+                ingredientesReceta.add(ri);
+            }
+        }
+
+        if(ingredientesReceta.isEmpty()) {
+            throw new IllegalArgumentException("La despensa del usuario tiene todos los ingredientes necesarios para las recetas.");
+        }
+
+        return ingredientesReceta;
+    }
+
+
+
+
+
+
 }
