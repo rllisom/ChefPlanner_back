@@ -83,6 +83,10 @@ public class RecipeService {
                 .toList();
     }
 
+    public Page<Recipe> findByFeatured(Pageable pageable){
+        return repository.findFeaturedRecipes(pageable);
+    }
+
     @Transactional
     public void deleteById(Long id) {
         if (repository.existsById(id)) {
