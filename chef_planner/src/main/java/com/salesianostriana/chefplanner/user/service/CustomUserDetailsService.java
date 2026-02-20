@@ -27,4 +27,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
+    public double contarUsuarios(){
+        return userRepository.findAll().stream().count();
+    }
+
 }

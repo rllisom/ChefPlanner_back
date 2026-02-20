@@ -33,4 +33,9 @@ public class IngredientService {
     public void deleteIngredient(Long id){
         ingredientRepository.deleteById(id);
     }
+
+
+    public double cantidadIngredientes(){
+        return ingredientRepository.findAll().stream().count();
+    }
 }

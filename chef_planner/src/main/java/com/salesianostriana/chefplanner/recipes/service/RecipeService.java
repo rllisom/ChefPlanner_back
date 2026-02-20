@@ -1,5 +1,7 @@
 package com.salesianostriana.chefplanner.recipes.service;
 
+import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
+import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
 import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -105,6 +109,21 @@ public class RecipeService {
 
     public Page<Recipe> findByAuthor(String userUuid, Pageable pageable) {
         return repository.findByAuthorUserUuid(userUuid, pageable);
+    }
+
+
+    public double cantRecetas(){
+        return repository.findAll().stream()
+                .count();
+    }
+
+    public Map<Recipe, List<RecipeIngredient>> ingredientesPorReceta(){
+        Map<Recipe,List<RecipeIngredient>> ingredients = new HashMap<>();
+        
+        repository.findAll().stream()
+                .forEach( r -> {
+                    ingredients.put(r,r.getIngredients());
+                });
     }
 
 }
