@@ -1,12 +1,13 @@
 package com.salesianostriana.chefplanner.user.service;
 
 import com.salesianostriana.chefplanner.security.jwt.JwtAccessTokenService;
-import com.salesianostriana.chefplanner.user.repository.UserRepository;
 import com.salesianostriana.chefplanner.user.dto.LoginRequest;
 import com.salesianostriana.chefplanner.user.dto.LoginResponse;
 import com.salesianostriana.chefplanner.user.dto.RegisterRequest;
 import com.salesianostriana.chefplanner.user.dto.RegisterResponse;
 import com.salesianostriana.chefplanner.user.model.User;
+import com.salesianostriana.chefplanner.user.model.UserRole;
+import com.salesianostriana.chefplanner.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +41,7 @@ public class AuthService {
                 .email(request.email())
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
+                .roles(Set.of(UserRole.USER, UserRole.MANAGER)) // roles por defecto
                 .build();
 
         User saved = userRepository.save(user);
