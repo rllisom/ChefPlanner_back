@@ -76,7 +76,7 @@ public class IngredientController {
             ),
 
     })
-    @GetMapping("admin/ingredient/search")
+    @GetMapping("/admin/ingredient/search")
     public Page<IngredientResponse> filtrarIngredientes(@PageableDefault(page = 0,size = 20,sort = "name",direction = Sort.Direction.DESC) Pageable pageable,
                                                         @RequestParam(required = false) String name){
         return ingredientService.mostrarFiltrados(name,pageable).map(IngredientResponse::of);
@@ -141,13 +141,13 @@ public class IngredientController {
                     )
             )
     })
-    @PostMapping("admin/ingredient/add")
+    @PostMapping("/admin/ingredient/add")
     @PreAuthorize("hasRole('ADMIN')")
     public IngredientResponse addIngredient(@RequestBody IngredientRequest request) {
         return IngredientResponse.of(ingredientService.addIngredient(request));
     }
 
-    @DeleteMapping("/ingredient/delete/{id}")
+    @DeleteMapping("/admin/ingredient/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteIngredient(@PathVariable Long id) {
         ingredientService.deleteIngredient(id);
