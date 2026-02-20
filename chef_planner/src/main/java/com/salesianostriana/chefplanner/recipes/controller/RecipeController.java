@@ -4,12 +4,9 @@ import com.salesianostriana.chefplanner.recipes.Dto.RecipeDetailsResponse;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeRequest;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeResponse;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
-import com.salesianostriana.chefplanner.recipes.model.Difficulty;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
 import com.salesianostriana.chefplanner.user.model.User;
-import com.salesianostriana.chefplanner.user.repository.UserRepository;
-import com.salesianostriana.chefplanner.user.service.AuthService;
 import com.salesianostriana.chefplanner.user.service.CustomUserDetailsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +34,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("api/v1/recipes")
+@RequestMapping("api/v1/")
 @RequiredArgsConstructor
 @Tag(name = "Recetas", description = "Gestión de recetas de cocina")
 
@@ -47,7 +45,7 @@ public class RecipeController {
 
 
 
-    @GetMapping("/buscar")
+    @GetMapping("recipe/buscar")
     @Operation(summary = "Buscar recetas por texto",
             description = "Filtra las recetas cuyo título o descripción coincidan con el término proporcionado.")
     @ApiResponses({
@@ -100,7 +98,7 @@ public class RecipeController {
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("recipe/{id}")
     @Operation(summary = "Obtener el detalle de una receta",
             description = "Devuelve la información completa de una receta, incluyendo su lista de ingredientes y cantidades.")
     @ApiResponses({
@@ -149,10 +147,12 @@ public class RecipeController {
     }
 
 
-    @GetMapping
-    @Operation(summary = "Endpoint para obtener todas las recetas paginadas",
-            description = "Devuelve una página de recetas con información básica. " +
-                    "Se pueden usar los parámetros 'page', 'size' y 'sort' en la URL.")
+
+    //metodo todas recetas admin
+    @PreAuthorize("hasRole('ADMIN')") // Solo permite el acceso si el usuario tiene ROLE_ADMIN [Conversación previa]
+    @GetMapping("/admin/recipes")
+    @Operation(summary = "Endpoint para obtener todas las recetas paginadas para la vista de admin",
+            description = "Devuelve una página de recetas con información básica. ")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
@@ -184,26 +184,24 @@ public class RecipeController {
                     )
             )
     })
-    public Page<RecipeResponse> findAll(
+    public Page<RecipeResponse> findAllAdmin(
             @Parameter(description = "Configuración de paginación (page, size, sort)",
                     example = "page=0&size=10&sort=title,asc")
             Pageable pageable) {
 
-        Page<Recipe> recipes = service.findAll(pageable);
+        Page<Recipe> allRecipes = service.findAll(pageable);
 
-        return recipes.map(recipe -> {
-
-            String authorUuidStr = recipe.getAuthor().getUserUuid();
-
-            String authorUsername = customUserDetailsService.findById(UUID.fromString(authorUuidStr))
+        return allRecipes.map(recipe -> {
+            String authorUuid = recipe.getAuthor().getUserUuid();
+            String username = customUserDetailsService.findById(UUID.fromString(authorUuid))
                     .map(User::getUsername)
                     .orElse("Usuario no encontrado");
 
-            return RecipeResponse.fromEntity(recipe, authorUsername);
+            return RecipeResponse.fromEntity(recipe, username);
         });
     }
 
-    @PutMapping("/edit/{id}")
+    @PutMapping("recipe/edit/{id}")
     @Operation(summary = "Editar una receta existente",
             description = "Actualiza los campos básicos de una receta. Los cambios se sincronizan automáticamente gracias al mecanismo de Dirty Checking de Hibernate.")
     @ApiResponses({
@@ -250,7 +248,7 @@ public class RecipeController {
         return RecipeDetailsResponse.fromEntity(updatedRecipe,username);
     }
 
-    @PostMapping ("/crear")
+    @PostMapping ("recipe/crear")
     @Operation(summary = "Endpoint para crear y guardar una nueva receta",
             description = "Crea una receta a partir de los datos del cuerpo de la petición y la asocia a un autor existente. " +
                     "Devuelve el detalle completo de la receta creada.")
@@ -303,7 +301,7 @@ public class RecipeController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("recipe/delete/{id}")
     @Operation(summary = "Eliminar una receta",
             description = "Elimina de forma permanente una receta y sus ingredientes asociados de la base de datos.")
     @ApiResponses({
@@ -353,7 +351,24 @@ public class RecipeController {
     }
 
 
-    @GetMapping("/featured")
+    @GetMapping("recipe/recetasUsuario/{id}")
+    @Operation(summary = "Obtener recetas de un usuario específico",
+            description = "Recupera todas las recetas asociadas al UUID de un autor. " +
+                    "El nombre del autor se resuelve mediante el servicio de usuarios.")
+    public Page<RecipeResponse> findByUser(
+            @PathVariable UUID id,
+            Pageable pageable) {
+
+        String authorUsername = customUserDetailsService.findById(id)
+                .map(User::getUsername)
+                .orElse("Usuario Desconocido");
+        Page<Recipe> userRecipes = service.findByAuthor(id.toString(), pageable);
+        return userRecipes.map(recipe ->
+                RecipeResponse.fromEntity(recipe, authorUsername));
+    }
+
+
+    @GetMapping("recipe/featured")
     @Operation(summary = "Obtener recetas destacadas paginadas",
             description = "Recupera una página de recetas marcadas como 'featured'. " +
                     "El nombre del autor se resuelve de forma desacoplada consultando el módulo de usuarios.")

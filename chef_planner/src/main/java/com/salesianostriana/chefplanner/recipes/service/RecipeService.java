@@ -1,12 +1,9 @@
 package com.salesianostriana.chefplanner.recipes.service;
 
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
-import com.salesianostriana.chefplanner.recipes.model.Difficulty;
 import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
-import com.salesianostriana.chefplanner.user.model.UserProfile;
 import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
-import com.salesianostriana.chefplanner.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +30,15 @@ public class RecipeService {
         return repository.save(recipe);
     }
 
+    @jakarta.transaction.Transactional
+    public Recipe saveDirectly(Recipe recipe) {
+        return repository.save(recipe);
+    }
+    @Transactional(readOnly = true)
     public Page<Recipe> findAll(Pageable pageable) {
         return repository.findAll(pageable);
     }
+
 
     public Page<Recipe> findMyRecipes(Long authorId, Pageable pageable) {
         return repository.findByAuthorId(authorId, pageable);
@@ -100,5 +102,9 @@ public class RecipeService {
         recipe.setFeatured(!recipe.isFeatured());
     }
 
+
+    public Page<Recipe> findByAuthor(String userUuid, Pageable pageable) {
+        return repository.findByAuthorUserUuid(userUuid, pageable);
+    }
 
 }

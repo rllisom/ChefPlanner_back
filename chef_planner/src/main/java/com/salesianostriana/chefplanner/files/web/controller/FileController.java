@@ -2,7 +2,13 @@ package com.salesianostriana.chefplanner.files.web.controller;
 
 import com.salesianostriana.chefplanner.files.shared.utils.MimeTypeDetector;
 import com.salesianostriana.chefplanner.files.storage.StorageService;
+import com.salesianostriana.chefplanner.recipes.Dto.RecipeDetailsResponse;
+import com.salesianostriana.chefplanner.recipes.model.Recipe;
+import com.salesianostriana.chefplanner.recipes.service.RecipeService;
+import com.salesianostriana.chefplanner.user.model.User;
+import com.salesianostriana.chefplanner.user.service.CustomUserDetailsService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -13,14 +19,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -29,7 +35,9 @@ import java.io.IOException;
 public class FileController {
 
     private final StorageService storageService;
+    private final RecipeService recipeService;
     private final MimeTypeDetector mimeTypeDetector;
+    private final CustomUserDetailsService customUserDetailsService;
 
 
     @Operation(
@@ -53,14 +61,14 @@ public class FileController {
                             schema = @Schema(implementation = ProblemDetail.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "detail": "No se ha encontrado el fichero",
-                                            "instance": "/api/v1/files/ejemplo.txt",
-                                            "status": 404,
-                                            "title": "Entidad no encontrada",
-                                            "type": "gestorficheros.com/error/no-encontrado"
-                                        }
-                                        """
+                                            {
+                                                "detail": "No se ha encontrado el fichero",
+                                                "instance": "/api/v1/files/ejemplo.txt",
+                                                "status": 404,
+                                                "title": "Entidad no encontrada",
+                                                "type": "gestorficheros.com/error/no-encontrado"
+                                            }
+                                            """
                             )
                     )
             )
@@ -73,12 +81,12 @@ public class FileController {
         ResponseEntity.BodyBuilder builder = ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, mimeType);
 
-        try{
+        try {
             long len = resource.contentLength();
             if (len >= 0) {
                 builder.header(HttpHeaders.CONTENT_LENGTH, Long.toString(len));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IOException(e.toString());
         }
 
@@ -102,20 +110,20 @@ public class FileController {
             @PathVariable Long id,
             @RequestPart("file") MultipartFile file) throws IOException {
 
-        Recipe recipe = service.findById(id);
-
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
+        Recipe recipe = recipeService.findById(id);
+
         recipe.setCoverFileData(file.getBytes());
         recipe.setCoverFileType(file.getContentType());
 
-        Recipe savedRecipe = service.saveDirectly(recipe);
+        Recipe savedRecipe = recipeService.saveDirectly(recipe);
+
         String authorUsername = customUserDetailsService.findById(UUID.fromString(savedRecipe.getAuthor().getUserUuid()))
                 .map(User::getUsername)
                 .orElse("Usuario Desconocido");
-
         return ResponseEntity.ok(RecipeDetailsResponse.fromEntity(savedRecipe, authorUsername));
     }
 }
