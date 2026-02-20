@@ -5,6 +5,7 @@ import com.salesianostriana.chefplanner.recipeingredient.dto.RecipeIngredientReq
 import com.salesianostriana.chefplanner.recipeingredient.dto.RecipeIngredientResponse;
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
 import com.salesianostriana.chefplanner.recipeingredient.service.RecipeIngredientService;
+import com.salesianostriana.chefplanner.user.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -73,11 +75,10 @@ public class RecipeIngredientController {
                     )
             )
     })
-    @GetMapping("/ingredient/shopping/basket/{userId}")
+    @GetMapping("/ingredient/shopping/basket")
     public ResponseEntity<List<CompraRecipeIngredient>> getShoppingBasket(
-            @Parameter(description = "ID del usuario", example = "1")
-            @PathVariable Long userId) {
-        List<RecipeIngredient> list = recipeIngredientService.mostrarIngredientesRecetas(userId);
+            @AuthenticationPrincipal User user) {
+        List<RecipeIngredient> list = recipeIngredientService.mostrarIngredientesRecetas(user.getId());
 
         List<CompraRecipeIngredient> response = list.stream()
                 .collect(Collectors.groupingBy(
