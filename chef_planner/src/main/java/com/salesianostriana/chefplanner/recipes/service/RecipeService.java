@@ -116,14 +116,11 @@ public class RecipeService {
         return repository.findAll().stream()
                 .count();
     }
+    @Transactional(readOnly = true)
+    public double tiempoMedioRecetas() {
+        Double resultado = repository.getAverageDuration();
 
-    public Map<Recipe, List<RecipeIngredient>> ingredientesPorReceta(){
-        Map<Recipe,List<RecipeIngredient>> ingredients = new HashMap<>();
-        
-        repository.findAll().stream()
-                .forEach( r -> {
-                    ingredients.put(r,r.getIngredients());
-                });
+        return resultado != null ? resultado : 0.0;
     }
 
 }

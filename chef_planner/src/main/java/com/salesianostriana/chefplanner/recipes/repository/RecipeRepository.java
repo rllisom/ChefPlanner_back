@@ -21,6 +21,10 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long>, JpaSpecif
 
     Page<Recipe> findByAuthorUserUuid(String userUuid, Pageable pageable);
 
+    @Query("SELECT AVG(r.minutes) " +
+            "FROM Recipe r")
+    Double getAverageDuration();
+
 
 
 
