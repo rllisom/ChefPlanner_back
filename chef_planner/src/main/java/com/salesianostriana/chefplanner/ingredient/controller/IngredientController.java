@@ -2,6 +2,7 @@ package com.salesianostriana.chefplanner.ingredient.controller;
 
 import com.salesianostriana.chefplanner.ingredient.dto.IngredientRequest;
 import com.salesianostriana.chefplanner.ingredient.dto.IngredientResponse;
+import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
 import com.salesianostriana.chefplanner.ingredient.service.IngredientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -81,6 +82,15 @@ public class IngredientController {
                                                         @RequestParam(required = false) String name){
         return ingredientService.mostrarFiltrados(name,pageable).map(IngredientResponse::of);
 
+    }
+
+    @GetMapping("/ingredients")
+    public Page<IngredientResponse> getMyPantryIngredients(
+            @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+
+        Page<Ingredient> page = ingredientService.getPantryIngredientsOfCurrentUser(pageable);
+
+        return page.map(IngredientResponse::of);
     }
 
     @Operation(summary = "Agregar un nuevo ingrediente",
