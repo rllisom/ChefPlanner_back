@@ -64,18 +64,14 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "User not found: " + loginRequest.username()
                 ));
-        String token = jwtAccessTokenService.generateAccessToken(user);
 
-        String role = user.getRoles().stream()
-                .findFirst()
-                .map(Enum::name)
-                .orElse("USER");
+        String token = jwtAccessTokenService.generateAccessToken(user);
 
         return new LoginResponse(
                 user.getUsername(),
                 user.getId(),
                 token,
-                role
+                user.getRoles().stream().map(String::valueOf).toList()
         );
     }
 }

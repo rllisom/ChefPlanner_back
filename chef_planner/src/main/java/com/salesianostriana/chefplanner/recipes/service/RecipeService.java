@@ -4,8 +4,10 @@ import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
 import com.salesianostriana.chefplanner.recipes.Dto.FeaturedCountDTO;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
+import com.salesianostriana.chefplanner.recipes.error.RecipeNotFoundException;
 import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
+import com.salesianostriana.chefplanner.user.model.UserProfile;
 import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -127,6 +129,21 @@ public class RecipeService {
     @Transactional(readOnly = true)
     public List<FeaturedCountDTO> obtenerRecetasDestacadasPorUsuario() {
         return repository.countFeaturedRecipesPerUser();
+    }
+
+
+    //Eliminar receta (ADMIN y User)
+    public void deleteRecipe(Long id) {
+        Recipe recipe = findById(id);
+        UserProfile userProfile = recipe.getAuthor();
+
+        if (repository.existsById(id)) {
+            userProfile.getRecipes().remove(recipe);
+            repository.deleteById(id);
+
+        } else {
+            throw new RecipeNotFoundException("Receta no encontrada");
+        }
     }
 
 }

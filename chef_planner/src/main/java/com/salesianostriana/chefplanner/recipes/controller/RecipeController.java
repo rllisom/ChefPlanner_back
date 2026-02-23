@@ -400,5 +400,16 @@ public class RecipeController {
         });
     }
 
-
+    @Operation(summary = "Eliminar una receta", description = "Elimina una receta específica por su ID. ")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Receta eliminada con éxito", content = @Content),
+        @ApiResponse(responseCode = "404", description = "No se encontró la receta con el ID proporcionado", content = @Content)
+    })
+    @DeleteMapping("/admin/recipe/delete/{id}")
+    public ResponseEntity<Void> deleteRecipe(
+            @Parameter(description = "ID de la receta a eliminar", example = "1")
+            @PathVariable Long id) {
+        service.deleteRecipe(id);
+        return ResponseEntity.noContent().build();
+    }
 }

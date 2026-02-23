@@ -24,12 +24,11 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long>, JpaSpecif
 
     Page<Recipe> findByAuthorUserUuid(String userUuid, Pageable pageable);
 
-    @Query("SELECT AVG(r.minutes) " +
-            "FROM Recipe r")
+    @Query(value = "SELECT AVG(EXTRACT(EPOCH FROM minutes)) FROM recipe", nativeQuery = true)
     Double getAverageDuration();
 
     @Query("""
-       SELECT new com.salesianostriana.chefplanner.recipes.web.dto.FeaturedCountDTO(r.author.userUuid, COUNT(r))
+       SELECT new com.salesianostriana.chefplanner.recipes.Dto.FeaturedCountDTO(r.author.userUuid, COUNT(r))
        FROM Recipe r
        WHERE r.featured = true
        GROUP BY r.author.userUuid
