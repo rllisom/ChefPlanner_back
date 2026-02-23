@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chefplanner-api-dev
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chefplanner_db
+      SPRING_DATASOURCE_USERNAME: chefplanner_user
+      SPRING_DATASOURCE_PASSWORD_FILE: /run/secrets/db_password
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    secrets:
+      - db_password
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: chefplanner-postgres-dev
+    environment:
+      POSTGRES_DB: chefplanner_db
+      POSTGRES_USER: chefplanner_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    ports:
+      - "5432:5432"
+    tmpfs:
+      - /var/lib/postgresql/data:rw,noexec,nosuid,size=512m
+    secrets:
+      - db_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chefplanner_user -d chefplanner_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+secrets:
+  db_password:
+    file: ./secrets/dev_db_password.txt
