@@ -1,7 +1,7 @@
 package com.salesianostriana.chefplanner.menuitem.dto;
 
 import com.salesianostriana.chefplanner.menuitem.model.MealType;
-import com.salesianostriana.chefplanner.menuitem.validation.ValidYear;
+import com.salesianostriana.chefplanner.menuitem.validation.ValidWeekRange;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -9,10 +9,9 @@ import java.time.LocalDate;
 
 public record MenuItemRequest(
 
-
-        @Schema(description = "Fecha del elemento de menú", example = "2024-01-15")
+        @Schema(description = "Fecha del elemento de menú", example = "2026-02-25")
         @NotNull(message = "La fecha es obligatoria")
-        @ValidYear(minYear = 2024, maxYear = 2025, message = "El año debe estar entre 2024 y 2025")
+        @ValidWeekRange
         LocalDate date,
 
         @Schema(description = "Tipo de comida", example = "LUNCH")

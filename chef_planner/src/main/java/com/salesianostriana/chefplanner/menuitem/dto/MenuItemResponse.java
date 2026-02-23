@@ -10,7 +10,7 @@ public record MenuItemResponse(
         @Schema(description = "ID del menuItem", example = "1")
         Long id,
 
-        @Schema(description = "Fecha del elemento de menú", example = "2024-01-15")
+        @Schema(description = "Fecha del elemento de menú", example = "2026-01-15")
         LocalDate date,
 
         @Schema(description = "Tipo de comida", example = "LUNCH")
