@@ -24,7 +24,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long>, JpaSpecif
 
     Page<Recipe> findByAuthorUserUuid(String userUuid, Pageable pageable);
 
-    @Query(value = "SELECT AVG(EXTRACT(EPOCH FROM minutes)) FROM recipe", nativeQuery = true)
+    @Query(value = "SELECT AVG(EXTRACT(EPOCH FROM minutes)) FROM recipes", nativeQuery = true)
     Double getAverageDuration();
 
     @Query("""
