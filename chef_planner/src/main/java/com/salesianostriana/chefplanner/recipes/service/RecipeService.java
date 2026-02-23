@@ -1,5 +1,8 @@
 package com.salesianostriana.chefplanner.recipes.service;
 
+import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
+import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
+import com.salesianostriana.chefplanner.recipes.Dto.FeaturedCountDTO;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
 import com.salesianostriana.chefplanner.recipes.error.RecipeNotFoundException;
 import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
@@ -14,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -107,6 +112,23 @@ public class RecipeService {
 
     public Page<Recipe> findByAuthor(String userUuid, Pageable pageable) {
         return repository.findByAuthorUserUuid(userUuid, pageable);
+    }
+
+
+    public double cantRecetas(){
+        return repository.findAll().stream()
+                .count();
+    }
+    @Transactional(readOnly = true)
+    public double tiempoMedioRecetas() {
+        Double resultado = repository.getAverageDuration();
+
+        return resultado != null ? resultado : 0.0;
+    }
+
+    @Transactional(readOnly = true)
+    public List<FeaturedCountDTO> obtenerRecetasDestacadasPorUsuario() {
+        return repository.countFeaturedRecipesPerUser();
     }
 
 
