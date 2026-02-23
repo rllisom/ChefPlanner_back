@@ -69,7 +69,9 @@ public class AuthService {
 
         return new LoginResponse(
                 user.getUsername(),
-                token
+                user.getId(),
+                token,
+                user.getRoles().stream().map(String::valueOf).toList()
         );
     }
 }
