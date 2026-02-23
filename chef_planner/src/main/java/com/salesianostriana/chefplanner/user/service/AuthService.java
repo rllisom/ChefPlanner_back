@@ -54,6 +54,7 @@ public class AuthService {
     }
 
     public LoginResponse doLogin(LoginRequest loginRequest) {
+        System.out.println("Intentando autenticar usuario: " + loginRequest.username() + " con contraseña: " + loginRequest.password());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.username(), loginRequest.password()
