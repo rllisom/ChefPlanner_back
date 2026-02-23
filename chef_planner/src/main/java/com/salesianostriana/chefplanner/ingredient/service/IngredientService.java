@@ -67,4 +67,9 @@ public class IngredientService {
 
         return new PageImpl<>(pagedList, pageable, ingredients.size());
     }
+
+
+    public double cantidadIngredientes(){
+        return ingredientRepository.findAll().stream().count();
+    }
 }

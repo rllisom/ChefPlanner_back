@@ -7,7 +7,6 @@ import com.salesianostriana.chefplanner.user.dto.RegisterRequest;
 import com.salesianostriana.chefplanner.user.dto.RegisterResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +27,7 @@ public class AuthController {
             description = "Autentica credenciales y devuelve un token JWT para acceder al resto de la API."
     )
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> doLogin(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> doLogin(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity
                 .status(201)
                 .body(authService.doLogin(loginRequest));
