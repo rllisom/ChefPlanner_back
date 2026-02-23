@@ -188,19 +188,12 @@ public class RecipeController {
                     )
             )
     })
-    public Page<RecipeResponse> findAllAdmin(
-            @Parameter(description = "Configuración de paginación (page, size, sort)",
-                    example = "page=0&size=10&sort=title,asc")
-            Pageable pageable) {
-
-        Page<Recipe> allRecipes = service.findAll(pageable);
-
-        return allRecipes.map(recipe -> {
+    public Page<RecipeResponse> findAllAdmin(Pageable pageable) {
+        return service.findAll(pageable).map(recipe -> {
             String authorUuid = recipe.getAuthor().getUserUuid();
             String username = customUserDetailsService.findById(UUID.fromString(authorUuid))
                     .map(User::getUsername)
                     .orElse("Usuario no encontrado");
-
             return RecipeResponse.fromEntity(recipe, username);
         });
     }

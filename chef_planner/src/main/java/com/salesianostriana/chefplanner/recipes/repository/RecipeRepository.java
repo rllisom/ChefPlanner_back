@@ -35,7 +35,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long>, JpaSpecif
        """)
     List<FeaturedCountDTO> countFeaturedRecipesPerUser();
 
-
+    @Query("SELECT r FROM Recipe r JOIN FETCH r.author")
+    Page<Recipe> findAllWithAuthor(Pageable pageable);
 
 
 
