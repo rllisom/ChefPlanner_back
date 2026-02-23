@@ -3,16 +3,18 @@
 -- =============================================
 INSERT INTO users (id, email, username, password)
 VALUES
-('a1b2c3d4-0000-0000-0000-000000000001', 'admin@chefplanner.com', 'admin', '$2a$10$...'),
-('a1b2c3d4-0000-0000-0000-000000000002', 'chef1@chefplanner.com', 'chef_maria', '$2a$10$...'),
-('a1b2c3d4-0000-0000-0000-000000000003', 'chef2@chefplanner.com', 'chef_pedro', '$2a$10$...')
-ON CONFLICT (id) DO NOTHING;
+    ('a1b2c3d4-0000-0000-0000-000000000001', 'admin@chefplanner.com', 'admin', '$2a$10$7QJ8z1Z1Z1Z1Z1Z1Z1Z1ZeK1K1K1K1K1K1K1K1K1K1K1K1K1K1K1K'),
+    ('a1b2c3d4-0000-0000-0000-000000000002', 'chef1@chefplanner.com', 'chef_maria', '$2a$10$7QJ8z1Z1Z1Z1Z1Z1Z1Z1ZeK1K1K1K1K1K1K1K1K1K1K1K1K1K1K1K'),
+    ('a1b2c3d4-0000-0000-0000-000000000003', 'chef2@chefplanner.com', 'chef_pedro', '$2a$10$7QJ8z1Z1Z1Z1Z1Z1Z1Z1ZeK1K1K1K1K1K1K1K1K1K1K1K1K1K1K1K');
+
 -- =============================================
 -- USER ROLES (tabla de colección)
 -- =============================================
-INSERT INTO users (id, email, username, password)
-VALUES ('a1b2c3d4-0000-0000-0000-000000000001', 'admin@chefplanner.com', 'admin', '...')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO user_roles (user_id, role)
+VALUES
+    ('a1b2c3d4-0000-0000-0000-000000000001', 'ADMIN'),
+    ('a1b2c3d4-0000-0000-0000-000000000002', 'USER'),
+    ('a1b2c3d4-0000-0000-0000-000000000003', 'USER');
 -- =============================================
 -- USER PROFILES
 -- =============================================
