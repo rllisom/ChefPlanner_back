@@ -7,6 +7,7 @@ import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
 import com.salesianostriana.chefplanner.recipes.error.RecipeNotFoundException;
 import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
+import com.salesianostriana.chefplanner.user.model.UserProfile;
 import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

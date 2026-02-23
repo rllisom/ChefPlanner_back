@@ -3,9 +3,9 @@
 -- =============================================
 INSERT INTO users (id, email, username, password)
 VALUES
-    ('a1b2c3d4-0000-0000-0000-000000000001', 'admin@chefplanner.com', 'admin', '$2a$10$7QJ8z1Z1Z1Z1Z1Z1Z1Z1ZeK1K1K1K1K1K1K1K1K1K1K1K1K1K1K1K'),
-    ('a1b2c3d4-0000-0000-0000-000000000002', 'chef1@chefplanner.com', 'chef_maria', '$2a$10$7QJ8z1Z1Z1Z1Z1Z1Z1Z1ZeK1K1K1K1K1K1K1K1K1K1K1K1K1K1K1K'),
-    ('a1b2c3d4-0000-0000-0000-000000000003', 'chef2@chefplanner.com', 'chef_pedro', '$2a$10$7QJ8z1Z1Z1Z1Z1Z1Z1Z1ZeK1K1K1K1K1K1K1K1K1K1K1K1K1K1K1K');
+('a1b2c3d4-0000-0000-0000-000000000001', 'admin@chefplanner.com', 'admin', '$2a$10$...'),
+('a1b2c3d4-0000-0000-0000-000000000002', 'chef1@chefplanner.com', 'chef_maria', '$2a$10$...'),
+('a1b2c3d4-0000-0000-0000-000000000003', 'chef2@chefplanner.com', 'chef_pedro', '$2a$10$...')
 ON CONFLICT (id) DO NOTHING;
 -- =============================================
 -- USER ROLES (tabla de colección)
