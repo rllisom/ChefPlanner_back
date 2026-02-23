@@ -10,9 +10,9 @@ import java.time.LocalDate;
 public record MenuItemRequest(
 
 
-        @Schema(description = "Fecha del elemento de menú", example = "2024-01-15")
+        @Schema(description = "Fecha del elemento de menú", example = "2026-01-15")
         @NotNull(message = "La fecha es obligatoria")
-        @ValidYear(minYear = 2024, maxYear = 2025, message = "El año debe estar entre 2024 y 2025")
+        @ValidYear(minYear = 2026, maxYear = 2027, message = "El año debe estar entre 2026 y 2027")
         LocalDate date,
 
         @Schema(description = "Tipo de comida", example = "LUNCH")
