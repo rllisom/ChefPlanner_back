@@ -27,7 +27,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtAccessTokenService jwtService;
     private final UserRepository userRepository;
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -38,34 +37,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String userId = jwtService.getUserIdFromAccessToken(token);
 
                 userRepository.findById(UUID.fromString(userId)).ifPresentOrElse(user -> {
-                    UsernamePasswordAuthenticationToken
-                            authenticationToken = new UsernamePasswordAuthenticationToken(
-                            user,
-                            null,
-                            user.getAuthorities()
-                    );
-
-                    authenticationToken.setDetails(
-                            new WebAuthenticationDetails(request)
-                    );
-
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    user,
+                                    null,
+                                    user.getAuthorities()
+                            );
+                    authenticationToken.setDetails(new WebAuthenticationDetails(request));
                     log.info("Usuario autenticado correctamente: " + userId);
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-                }, () -> {;
+                }, () -> {
                     throw new UsernameNotFoundException("User not found with userId: " + userId);
                 });
-
             }
 
-            filterChain.doFilter(request, response);
-
-
         } catch (JwtException ex) {
-            throw new RuntimeException(ex);
+            // Token inválido o malformado → limpiamos el contexto y dejamos pasar
+            log.warning("JWT inválido: " + ex.getMessage());
+            SecurityContextHolder.clearContext();
         }
 
-
+        // SIEMPRE continuamos la cadena, tanto si hay token válido como si no
+        filterChain.doFilter(request, response);
     }
 
     private String getJwtAccessTokenFromRequest(HttpServletRequest request) {
@@ -73,7 +67,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(JwtAccessTokenService.TOKEN_PREFIX)) {
             return bearerToken.substring(JwtAccessTokenService.TOKEN_PREFIX.length());
         }
-
         return null;
     }
 }
