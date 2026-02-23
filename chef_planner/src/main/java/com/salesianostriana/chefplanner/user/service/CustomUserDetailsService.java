@@ -2,6 +2,7 @@ package com.salesianostriana.chefplanner.user.service;
 
 import com.salesianostriana.chefplanner.user.model.User;
 import com.salesianostriana.chefplanner.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,6 +30,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     public double contarUsuarios(){
         return userRepository.findAll().stream().count();
+    }
+    @Transactional
+    public long obtenerCantidadTotalUsuarios() {
+        return userRepository.count();
     }
 
 }

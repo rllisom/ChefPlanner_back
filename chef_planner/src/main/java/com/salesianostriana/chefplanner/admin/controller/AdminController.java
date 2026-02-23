@@ -3,6 +3,7 @@ package com.salesianostriana.chefplanner.admin.controller;
 import com.salesianostriana.chefplanner.admin.controller.Dto.AdminDtoResponse;
 import com.salesianostriana.chefplanner.ingredient.service.IngredientService;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
+import com.salesianostriana.chefplanner.user.service.CustomUserDetailsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,22 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
     private final RecipeService recipeService;
     private final IngredientService ingredientService;
-
+    private final CustomUserDetailsService customUserDetailsService;
     @GetMapping("/admin/dashboard")
-    @PreAuthorize("hasRole('ADMIN')") // Seguridad restringida a administradores
+    @PreAuthorize("hasRole('ADMIN')") 
     @Operation(summary = "Obtener estadísticas globales",
             description = "Devuelve el conteo total de recetas e ingredientes, y el tiempo medio de preparación.")
     public ResponseEntity<AdminDtoResponse> getDashboardStats() {
-
-
-        double avgTime = recipeService.tiempoMedioRecetas();
-        double recipeCount = recipeService.cantRecetas();
-        double ingredientCount = ingredientService.cantidadIngredientes();
-
         return ResponseEntity.ok(new AdminDtoResponse(
-                avgTime,
-                recipeCount,
-                ingredientCount
+                recipeService.tiempoMedioRecetas(),
+                (long) recipeService.cantRecetas(),
+                (long) ingredientService.cantidadIngredientes(),
+                customUserDetailsService.obtenerCantidadTotalUsuarios(),
+                recipeService.obtenerRecetasDestacadasPorUsuario()
         ));
     }
 }

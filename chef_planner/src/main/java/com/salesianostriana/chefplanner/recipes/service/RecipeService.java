@@ -2,6 +2,7 @@ package com.salesianostriana.chefplanner.recipes.service;
 
 import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
+import com.salesianostriana.chefplanner.recipes.Dto.FeaturedCountDTO;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
 import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
@@ -121,6 +122,11 @@ public class RecipeService {
         Double resultado = repository.getAverageDuration();
 
         return resultado != null ? resultado : 0.0;
+    }
+
+    @Transactional(readOnly = true)
+    public List<FeaturedCountDTO> obtenerRecetasDestacadasPorUsuario() {
+        return repository.countFeaturedRecipesPerUser();
     }
 
 }
