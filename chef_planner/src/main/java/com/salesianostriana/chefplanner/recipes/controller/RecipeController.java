@@ -405,7 +405,7 @@ public class RecipeController {
         @ApiResponse(responseCode = "204", description = "Receta eliminada con éxito", content = @Content),
         @ApiResponse(responseCode = "404", description = "No se encontró la receta con el ID proporcionado", content = @Content)
     })
-    @DeleteMapping("recipe/delete/{id}")
+    @DeleteMapping("/admin/recipe/delete/{id}")
     public ResponseEntity<Void> deleteRecipe(
             @Parameter(description = "ID de la receta a eliminar", example = "1")
             @PathVariable Long id) {
