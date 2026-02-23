@@ -21,13 +21,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
-@RestControllerAdvice
+@RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Endpoints de ingrediente" )
 public class IngredientController {
 
     private final IngredientService ingredientService;
-
 
     @Operation(
             summary = "Filtrar ingredientes por nombre",
@@ -42,17 +41,17 @@ public class IngredientController {
                             schema = @Schema(implementation = Page.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "content": [
-                                                { "id": 1, "name": "Tomate" },
-                                                { "id": 2, "name": "Cebolla" }
-                                            ],
-                                            "totalElements": 2,
-                                            "totalPages": 1,
-                                            "size": 20,
-                                            "number": 0
-                                        }
-                                        """
+                                            {
+                                                "content": [
+                                                    { "id": 1, "name": "Tomate" },
+                                                    { "id": 2, "name": "Cebolla" }
+                                                ],
+                                                "totalElements": 2,
+                                                "totalPages": 1,
+                                                "size": 20,
+                                                "number": 0
+                                            }
+                                            """
                             )
                     )
             ),
@@ -64,23 +63,23 @@ public class IngredientController {
                             schema = @Schema(implementation = ProblemDetail.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "detail": "No se han encontrado ingredientes con el nombre proporcionado",
-                                            "instance": "/api/v1/ingredient/search",
-                                            "status": 404,
-                                            "title": "Ingredientes no encontrados",
-                                            "type": "chefplanner.com/error/ingredientes-no-encontrados"
-                                        }
-                                        """
+                                            {
+                                                "detail": "No se han encontrado ingredientes con el nombre proporcionado",
+                                                "instance": "/api/v1/ingredient/search",
+                                                "status": 404,
+                                                "title": "Ingredientes no encontrados",
+                                                "type": "chefplanner.com/error/ingredientes-no-encontrados"
+                                            }
+                                            """
                             )
                     )
             ),
 
     })
     @GetMapping("/admin/ingredient/search")
-    public Page<IngredientResponse> filtrarIngredientes(@PageableDefault(page = 0,size = 20,sort = "name",direction = Sort.Direction.DESC) Pageable pageable,
-                                                        @RequestParam(required = false) String name){
-        return ingredientService.mostrarFiltrados(name,pageable).map(IngredientResponse::of);
+    public Page<IngredientResponse> filtrarIngredientes(@PageableDefault(page = 0, size = 20, sort = "name", direction = Sort.Direction.DESC) Pageable pageable,
+                                                        @RequestParam(required = false) String name) {
+        return ingredientService.mostrarFiltrados(name, pageable).map(IngredientResponse::of);
 
     }
 
@@ -104,11 +103,11 @@ public class IngredientController {
                             schema = @Schema(implementation = IngredientResponse.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "id": 3,
-                                            "name": "Pimiento"
-                                        }
-                                        """
+                                            {
+                                                "id": 3,
+                                                "name": "Pimiento"
+                                            }
+                                            """
                             )
                     )
             ),
@@ -120,14 +119,14 @@ public class IngredientController {
                             schema = @Schema(implementation = ProblemDetail.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "detail": "No tienes permisos para acceder a este recurso",
-                                            "instance": "/api/v1/ingredient/add",
-                                            "status": 403,
-                                            "title": "Acceso denegado",
-                                            "type": "chefplanner.com/error/acceso-denegado"
-                                        }
-                                        """
+                                            {
+                                                "detail": "No tienes permisos para acceder a este recurso",
+                                                "instance": "/api/v1/ingredient/add",
+                                                "status": 403,
+                                                "title": "Acceso denegado",
+                                                "type": "chefplanner.com/error/acceso-denegado"
+                                            }
+                                            """
                             )
                     )
             ),
@@ -139,14 +138,14 @@ public class IngredientController {
                             schema = @Schema(implementation = ProblemDetail.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "detail": "El campo 'name' es obligatorio y no puede estar vacío",
-                                            "instance": "/api/v1/ingredient/add",
-                                            "status": 400,
-                                            "title": "Solicitud inválida",
-                                            "type": "chefplanner.com/error/solicitud-invalida"
-                                        }
-                                        """
+                                            {
+                                                "detail": "El campo 'name' es obligatorio y no puede estar vacío",
+                                                "instance": "/api/v1/ingredient/add",
+                                                "status": 400,
+                                                "title": "Solicitud inválida",
+                                                "type": "chefplanner.com/error/solicitud-invalida"
+                                            }
+                                            """
                             )
                     )
             )
@@ -162,4 +161,76 @@ public class IngredientController {
     public void deleteIngredient(@PathVariable Long id) {
         ingredientService.deleteIngredient(id);
     }
+
+
+    @Operation(summary = "Obtener ingredientes de la despensa (Admin)",
+            description = "Permite a los administradores obtener una lista paginada de todos los ingredientes disponibles en la despensa.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de ingredientes obtenida correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "content": [
+                                                    { "id": 1, "name": "Tomate" },
+                                                    { "id": 2, "name": "Cebolla" }
+                                                ],
+                                                "totalElements": 2,
+                                                "totalPages": 1,
+                                                "size": 20,
+                                                "number": 0
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acceso denegado. Se requiere rol ADMIN",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "detail": "No tienes permisos para acceder a este recurso",
+                                                "instance": "/api/v1/admin/ingredient",
+                                                "status": 403,
+                                                "title": "Acceso denegado",
+                                                "type": "chefplanner.com/error/acceso-denegado"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontraron ingredientes en la despensa.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "detail": "No se encontraron ingredientes en la despensa.",
+                                                "instance": "/api/v1/admin/ingredient",
+                                                "status": 404,
+                                                "title": "Ingredientes no encontrados",
+                                                "type": "chefplanner.com/error/ingredientes-no-encontrados"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/admin/ingredient")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<IngredientResponse> getPantryAdminIngredients(@PageableDefault(size = 20, sort = "name") Pageable pageable) {
+        return ingredientService.getPantryAdminIngredients(pageable).map(IngredientResponse::of);
+    }
 }
+

@@ -1,12 +1,14 @@
 package com.salesianostriana.chefplanner.ingredient.service;
 
 import com.salesianostriana.chefplanner.ingredient.dto.IngredientRequest;
+import com.salesianostriana.chefplanner.ingredient.error.IngredientNotFoundException;
 import com.salesianostriana.chefplanner.ingredient.filter.IngredientSpec;
 import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
 import com.salesianostriana.chefplanner.ingredient.repository.IngredientRepository;
 import com.salesianostriana.chefplanner.user.model.UserProfile;
 import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import com.salesianostriana.chefplanner.user.service.CurrentUserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,6 +33,15 @@ public class IngredientService {
         );
     }
 
+    public Page<Ingredient> getPantryAdminIngredients(Pageable pageable) {
+        Page<Ingredient> response = ingredientRepository.findAll(pageable);
+
+        if (response.isEmpty()) {
+            throw new IngredientNotFoundException("No se encontraron ingredientes en la despensa.");
+        }
+        return response;
+    }
+
     public Ingredient addIngredient(IngredientRequest request){
         Ingredient ingredient = Ingredient.builder()
                 .name(request.name())
@@ -43,6 +54,7 @@ public class IngredientService {
     }
 
 
+    @Transactional
     public Page<Ingredient> getPantryIngredientsOfCurrentUser(Pageable pageable) {
         String currentUserId = currentUserService.getCurrentUserIdAsString();
 
