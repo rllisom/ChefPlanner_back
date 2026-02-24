@@ -13,6 +13,7 @@ import com.salesianostriana.chefplanner.user.error.ProfileNotFoundException;
 import com.salesianostriana.chefplanner.user.model.UserProfile;
 import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -62,6 +63,7 @@ public class RecipeIngredientService {
         }
     }
 
+    @Transactional
     public List<RecipeIngredient> mostrarIngredientesRecetas(UUID idUser){
         List<RecipeIngredient> ingredientesReceta = new ArrayList<>();
         UserProfile userProfile = userProfileRepository.findByUserUuid(idUser.toString()).orElseThrow(

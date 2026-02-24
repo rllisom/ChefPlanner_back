@@ -32,6 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = getJwtAccessTokenFromRequest(request);
 
+
         try {
             if (StringUtils.hasText(token) && jwtService.validateAccessToken(token)) {
                 String userId = jwtService.getUserIdFromAccessToken(token);
@@ -55,6 +56,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtException ex) {
             // Token inválido o malformado → limpiamos el contexto y dejamos pasar
             log.warning("JWT inválido: " + ex.getMessage());
+            SecurityContextHolder.clearContext();
+        } catch (Exception ex) {  // ← AÑADE ESTO
+            log.warning("Error inesperado en el filtro JWT: " + ex.getMessage());
             SecurityContextHolder.clearContext();
         }
 

@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@RestControllerAdvice
+@RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Ingredientes de una recete", description = "Peticiones CRUD para la gestión de los ingredientes de una receta")
+@Tag(name = "Ingredientes de una receta", description = "Peticiones CRUD para la gestión de los ingredientes de una receta")
 public class RecipeIngredientController {
 
     private final RecipeIngredientService recipeIngredientService;
