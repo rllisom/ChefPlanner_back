@@ -232,5 +232,30 @@ public class IngredientController {
     public Page<IngredientResponse> getPantryAdminIngredients(@PageableDefault(size = 20, sort = "name") Pageable pageable) {
         return ingredientService.getPantryAdminIngredients(pageable).map(IngredientResponse::of);
     }
+
+    @Operation(summary = "Añadir un ingrediente a mi despensa",
+            description = "Añade un ingrediente existente a la despensa del usuario actual, evitando duplicados.")
+    @PostMapping("/pantry/{ingredientId}")
+    public void addIngredientToMyPantry(@PathVariable Long ingredientId) {
+        ingredientService.addIngredientToCurrentUserPantry(ingredientId);
+    }
+
+    @Operation(summary = "Eliminar un ingrediente de mi despensa",
+            description = "Elimina un ingrediente de la despensa del usuario actual.")
+    @DeleteMapping("/pantry/{ingredientId}")
+    public void removeIngredientFromMyPantry(@PathVariable Long ingredientId) {
+        ingredientService.removeIngredientFromCurrentUserPantry(ingredientId);
+    }
+
+    @GetMapping("/ingredients/available")
+    public Page<IngredientResponse> getAvailableIngredientsForPantry(
+            @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+
+        Page<Ingredient> page = ingredientService.getIngredientsNotInCurrentUserPantry(pageable);
+        return page.map(IngredientResponse::of);
+    }
+
+
+
 }
 
