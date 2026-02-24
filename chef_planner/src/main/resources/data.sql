@@ -1,4 +1,18 @@
 -- =============================================
+-- LIMPIAR TABLAS (orden inverso por foreign keys)
+-- =============================================
+TRUNCATE TABLE menu_item,
+               user_pantry_ingredients,
+               recipe_ingredient,
+               recipes,
+               user_profiles,
+               user_roles,
+               ingredient,
+               users
+RESTART IDENTITY CASCADE;
+
+
+-- =============================================
 -- USERS
 -- =============================================
 INSERT INTO users (id, email, username, password)
