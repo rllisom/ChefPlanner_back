@@ -1,6 +1,8 @@
 package com.salesianostriana.chefplanner.recipes.service;
 
 import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
+import com.salesianostriana.chefplanner.menuitem.model.MenuItem;
+import com.salesianostriana.chefplanner.menuitem.repository.MenuItemRepository;
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
 import com.salesianostriana.chefplanner.recipes.Dto.FeaturedCountDTO;
 import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
@@ -28,6 +30,7 @@ public class RecipeService {
     private final RecipeRepository repository;
 
     private final UserProfileRepository userRepository;
+    private final MenuItemRepository menuItemRepository;
 
     @Transactional
     public Recipe save(Recipe recipe, Long authorId) {
@@ -133,17 +136,23 @@ public class RecipeService {
 
 
     //Eliminar receta (ADMIN y User)
+    @Transactional
     public void deleteRecipe(Long id) {
-        Recipe recipe = findById(id);
-        UserProfile userProfile = recipe.getAuthor();
-
-        if (repository.existsById(id)) {
-            userProfile.getRecipes().remove(recipe);
-            repository.deleteById(id);
-
-        } else {
+        if (!repository.existsById(id)) {
             throw new RecipeNotFoundException("Receta no encontrada");
         }
+
+        Recipe recipe = findById(id);
+
+
+        List<MenuItem> menuItems = menuItemRepository.findMenuItemByRecipe_Id(id);
+        for (MenuItem menuItem : menuItems) {
+            menuItem.setRecipe(null);
+        }
+        menuItemRepository.saveAll(menuItems);
+
+        recipe.getAuthor().getRecipes().remove(recipe);
+        repository.deleteById(id);
     }
 
 }
