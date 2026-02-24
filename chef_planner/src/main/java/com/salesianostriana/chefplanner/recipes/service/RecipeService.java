@@ -76,6 +76,9 @@ public class RecipeService {
         Recipe originalRecipe = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Receta no encontrada"));
 
+        System.out.println("Esta entrando en el edit"+ recipe.getId()+id);
+
+
         originalRecipe.setTitle(recipe.getTitle());
         originalRecipe.setDescription(recipe.getDescription());
         originalRecipe.setMinutes(recipe.getMinutes());

@@ -121,8 +121,8 @@ SELECT setval(pg_get_serial_sequence('user_profiles', 'id'),
 SELECT setval(pg_get_serial_sequence('ingredient', 'id'),
               (SELECT MAX(id) FROM ingredient), true);
 
-SELECT setval(pg_get_serial_sequence('recipes', 'id'),
-              (SELECT MAX(id) FROM recipes), true);
+SELECT setval('recipes_seq', (SELECT MAX(id) FROM recipes));
+
 
 SELECT setval(pg_get_serial_sequence('menu_item', 'id'),
               (SELECT MAX(id) FROM menu_item), true);
