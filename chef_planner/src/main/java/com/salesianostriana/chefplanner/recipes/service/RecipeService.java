@@ -43,7 +43,7 @@ public class RecipeService {
     }
     @Transactional(readOnly = true)
     public Page<Recipe> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+        return repository.findAllWithAuthor(pageable);
     }
 
 

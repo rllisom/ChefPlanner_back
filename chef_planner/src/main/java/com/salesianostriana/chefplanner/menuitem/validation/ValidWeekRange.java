@@ -7,13 +7,10 @@ import java.lang.annotation.*;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = YearValidator.class)
+@Constraint(validatedBy = WeekRangeValidator.class)
 @Documented
-public @interface ValidYear {
-    String message() default "El año debe ser válido";
+public @interface ValidWeekRange {
+    String message() default "La fecha debe estar entre la semana actual y dentro de 2 semanas";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
-
-    int minYear() default 2000;
-    int maxYear() default 2100;
 }

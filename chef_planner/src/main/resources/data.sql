@@ -1,4 +1,18 @@
 -- =============================================
+-- LIMPIAR TABLAS (orden inverso por foreign keys)
+-- =============================================
+TRUNCATE TABLE menu_item,
+               user_pantry_ingredients,
+               recipe_ingredient,
+               recipes,
+               user_profiles,
+               user_roles,
+               ingredient,
+               users
+RESTART IDENTITY CASCADE;
+
+
+-- =============================================
 -- USERS
 -- =============================================
 INSERT INTO users (id, email, username, password)
@@ -94,3 +108,21 @@ VALUES
     (4, 3, '2026-02-24', 'LUNCH', 4),
     (5, 3, '2026-02-25', 'BREAKFAST', 1)
 ON CONFLICT DO NOTHING;
+
+
+-- =============================================
+-- SINCRONIZACIÓN DE SECUENCIAS
+-- Necesario porque los INSERTs usan IDs explícitos
+-- y las secuencias de PostgreSQL quedan desincronizadas
+-- =============================================
+SELECT setval(pg_get_serial_sequence('user_profiles', 'id'),
+              (SELECT MAX(id) FROM user_profiles), true);
+
+SELECT setval(pg_get_serial_sequence('ingredient', 'id'),
+              (SELECT MAX(id) FROM ingredient), true);
+
+SELECT setval(pg_get_serial_sequence('recipes', 'id'),
+              (SELECT MAX(id) FROM recipes), true);
+
+SELECT setval(pg_get_serial_sequence('menu_item', 'id'),
+              (SELECT MAX(id) FROM menu_item), true);
