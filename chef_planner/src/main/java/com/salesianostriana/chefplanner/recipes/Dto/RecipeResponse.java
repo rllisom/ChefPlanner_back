@@ -6,6 +6,7 @@ import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import java.time.Duration;
 
 public record RecipeResponse(
+        Long id,
         String title,
         Duration minutes,
         Difficulty difficulty,
@@ -15,6 +16,7 @@ public record RecipeResponse(
 
     public static RecipeResponse fromEntity(Recipe recipe,String username) {
         return new RecipeResponse(
+                recipe.getId(),
                 recipe.getTitle(),
                 recipe.getMinutes(),
                 recipe.getDifficulty(),
