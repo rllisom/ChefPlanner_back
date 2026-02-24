@@ -28,6 +28,9 @@ public record RecipeRequest (
         @ValidDifficulty
         Difficulty difficulty,
 
+        @Schema(description = "Indica el id del autor", example = "1")
+        Long authorId,
+
         @Schema(description = "Indica si la receta es destacada en la plataforma", example = "true")
         @NotNull
         boolean featured

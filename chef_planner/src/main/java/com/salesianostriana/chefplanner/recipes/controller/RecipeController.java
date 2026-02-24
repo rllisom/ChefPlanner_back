@@ -7,6 +7,8 @@ import com.salesianostriana.chefplanner.recipes.Dto.RecipeSearchRequest;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
 import com.salesianostriana.chefplanner.user.model.User;
+import com.salesianostriana.chefplanner.user.model.UserProfile;
+import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import com.salesianostriana.chefplanner.user.service.CustomUserDetailsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,6 +45,7 @@ public class RecipeController {
 
     private final RecipeService service;
     private final CustomUserDetailsService customUserDetailsService;
+    private final UserProfileRepository userProfileRepository;
 
 
 
@@ -184,19 +188,12 @@ public class RecipeController {
                     )
             )
     })
-    public Page<RecipeResponse> findAllAdmin(
-            @Parameter(description = "Configuración de paginación (page, size, sort)",
-                    example = "page=0&size=10&sort=title,asc")
-            Pageable pageable) {
-
-        Page<Recipe> allRecipes = service.findAll(pageable);
-
-        return allRecipes.map(recipe -> {
+    public Page<RecipeResponse> findAllAdmin(Pageable pageable) {
+        return service.findAll(pageable).map(recipe -> {
             String authorUuid = recipe.getAuthor().getUserUuid();
             String username = customUserDetailsService.findById(UUID.fromString(authorUuid))
                     .map(User::getUsername)
                     .orElse("Usuario no encontrado");
-
             return RecipeResponse.fromEntity(recipe, username);
         });
     }
@@ -287,17 +284,17 @@ public class RecipeController {
     })
     public ResponseEntity<RecipeDetailsResponse> save(
             @Valid @RequestBody RecipeRequest recipeRequest,
-            @Parameter(description = "ID del autor de la receta", example = "1")
-            @RequestParam Long authorId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal User user  // Cambiar UserDetails a User
     ) {
-
         Recipe recipe = recipeRequest.toEntity();
-        Recipe savedRecipe = service.save(recipe, authorId);
-        String username = userDetails != null ? userDetails.getUsername() : "Anónimo";
+        UserProfile profile = userProfileRepository.findByUserUuid(String.valueOf(user.getId()))
+                .orElseThrow(() -> new EntityNotFoundException("UserProfile no encontrado"));
+
+        Recipe savedRecipe = service.save(recipe, profile.getId());
+        String username = user.getUsername();
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(RecipeDetailsResponse.fromEntity(savedRecipe,username));
+                .body(RecipeDetailsResponse.fromEntity(savedRecipe, username));
     }
 
 
