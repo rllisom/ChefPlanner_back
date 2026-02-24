@@ -37,7 +37,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("api/v1/")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Recetas", description = "Gestión de recetas de cocina")
 
@@ -298,7 +298,7 @@ public class RecipeController {
     }
 
 
-    @DeleteMapping("recipe/delete/{id}")
+    @DeleteMapping("/recipe/delete/{id}")
     @Operation(summary = "Eliminar una receta",
             description = "Elimina de forma permanente una receta y sus ingredientes asociados de la base de datos.")
     @ApiResponses({
@@ -316,7 +316,7 @@ public class RecipeController {
     public ResponseEntity<Void> delete(
             @Parameter(description = "ID de la receta a eliminar", example = "1")
             @PathVariable Long id) {
-        service.deleteById(id);
+        service.deleteRecipe(id);
 
         return ResponseEntity.noContent().build();
     }

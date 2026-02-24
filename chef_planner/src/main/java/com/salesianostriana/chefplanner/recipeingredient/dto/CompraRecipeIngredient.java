@@ -7,7 +7,9 @@ public record CompraRecipeIngredient(
         @Schema(description = "Nombre del ingrediente", example = "Harina")
         String ingredientName,
         @Schema(description = "Cantidad total del ingrediente necesaria para hacer las recetas", example = "500")
-        int quantityTotal
+        int quantityTotal,
+        @Schema(description = "Unidad de medida del ingrediente", example = "gramos")
+        String unit
 ) {
 
 }

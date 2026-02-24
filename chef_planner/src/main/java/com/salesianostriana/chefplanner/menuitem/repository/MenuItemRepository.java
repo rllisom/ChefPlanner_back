@@ -15,4 +15,9 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
     List<MenuItem> findByDateBetweenOrderByDateAscMealTypeAsc(LocalDate startDate, LocalDate endDate);
 
     Optional<MenuItem> findByDateAndMealType(LocalDate date, MealType mealType);
+
+    MenuItem findByRecipe_Id(Long id);
+
+    List<MenuItem> findMenuItemByRecipe_Id(Long id);
+
 }

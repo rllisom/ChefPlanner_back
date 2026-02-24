@@ -11,6 +11,13 @@ TRUNCATE TABLE menu_item,
                users
 RESTART IDENTITY CASCADE;
 
+-- =============================================
+-- AJUSTE DE RESTRICCIONES
+-- Permitir que recipe_id sea NULL en menu_item
+-- (necesario para poder borrar recetas sin borrar el historial del menú)
+-- =============================================
+ALTER TABLE menu_item ALTER COLUMN recipe_id DROP NOT NULL;
+
 
 -- =============================================
 -- USERS

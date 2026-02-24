@@ -81,12 +81,20 @@ public class RecipeIngredientController {
         List<RecipeIngredient> list = recipeIngredientService.mostrarIngredientesRecetas(user.getId());
 
         List<CompraRecipeIngredient> response = list.stream()
-                .collect(Collectors.groupingBy(
+                .collect(Collectors.toMap(
                         ri -> ri.getIngredient().getName(),
-                        Collectors.summingInt(RecipeIngredient::getQuantity)
+                        ri -> new CompraRecipeIngredient(
+                                ri.getIngredient().getName(),
+                                ri.getQuantity(),
+                                ri.getUnit()
+                        ),
+                        (existing, current) -> new CompraRecipeIngredient(
+                                existing.ingredientName(),
+                                existing.quantityTotal() + current.quantityTotal(),
+                                existing.unit()
+                        )
                 ))
-                .entrySet().stream()
-                .map(entry -> new CompraRecipeIngredient(entry.getKey(), entry.getValue()))
+                .values().stream()
                 .toList();
 
         return ResponseEntity.ok(response);
