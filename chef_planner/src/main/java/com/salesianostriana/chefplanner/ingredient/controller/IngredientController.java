@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,7 +77,7 @@ public class IngredientController {
             ),
 
     })
-    @GetMapping("/admin/ingredient/search")
+    @GetMapping("/ingredient/search")
     public Page<IngredientResponse> filtrarIngredientes(@PageableDefault(page = 0, size = 20, sort = "name", direction = Sort.Direction.DESC) Pageable pageable,
                                                         @RequestParam(required = false) String name) {
         return ingredientService.mostrarFiltrados(name, pageable).map(IngredientResponse::of);
@@ -231,6 +232,13 @@ public class IngredientController {
     @PreAuthorize("hasRole('ADMIN')")
     public Page<IngredientResponse> getPantryAdminIngredients(@PageableDefault(size = 20, sort = "name") Pageable pageable) {
         return ingredientService.getPantryAdminIngredients(pageable).map(IngredientResponse::of);
+    }
+
+    /// Y añadir con select,
+    @DeleteMapping("/ingredient/user/{idProfile}/delete/{idIngredient}")
+    public ResponseEntity<?> deleteIngredientFromList(@PathVariable Long idProfile, @PathVariable Long idIngredient) {
+        ingredientService.eliminarIngredienteDeDespensa(idIngredient, idProfile);
+        return ResponseEntity.noContent().build();
     }
 }
 

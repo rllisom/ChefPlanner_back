@@ -33,6 +33,7 @@ public class IngredientService {
         );
     }
 
+    /***************************************ADMIN***************************************************************************/
     public Page<Ingredient> getPantryAdminIngredients(Pageable pageable) {
         Page<Ingredient> response = ingredientRepository.findAll(pageable);
 
@@ -52,6 +53,8 @@ public class IngredientService {
     public void deleteIngredient(Long id){
         ingredientRepository.deleteById(id);
     }
+
+    /***************************************ADMIN***************************************************************************/
 
 
     @Transactional
@@ -78,6 +81,24 @@ public class IngredientService {
         }
 
         return new PageImpl<>(pagedList, pageable, ingredients.size());
+    }
+
+    public void eliminarIngredienteDeDespensa(Long ingredientId, Long userProfileId) {
+        UserProfile profile = userProfileRepository.findById(userProfileId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "UserProfile no encontrado para id: " + userProfileId));
+
+        Ingredient ingredient = ingredientRepository.findById(ingredientId)
+                .orElseThrow(() -> new IngredientNotFoundException(
+                        "Ingrediente no encontrado para id: " + ingredientId));
+
+        if(profile.getPantryIngredients().contains(ingredient)){
+            profile.getPantryIngredients().remove(ingredient);
+            userProfileRepository.save(profile);
+        } else {
+            throw new IllegalStateException(
+                    "El ingrediente con id: " + ingredientId + " no está en la despensa del usuario con id: " + userProfileId);
+        }
     }
 
 
