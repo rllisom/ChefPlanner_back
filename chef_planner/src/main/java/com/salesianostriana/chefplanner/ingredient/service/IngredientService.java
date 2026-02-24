@@ -84,4 +84,58 @@ public class IngredientService {
     public double cantidadIngredientes(){
         return ingredientRepository.findAll().stream().count();
     }
+
+
+    @Transactional
+    public void addIngredientToCurrentUserPantry(Long ingredientId) {
+        String currentUserId = currentUserService.getCurrentUserIdAsString();
+
+        UserProfile profile = userProfileRepository.findByUserUuid(currentUserId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "UserProfile no encontrado para userUuid: " + currentUserId));
+
+        Ingredient ingredient = ingredientRepository.findById(ingredientId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Ingrediente no encontrado con id: " + ingredientId));
+
+        boolean alreadyInPantry = profile.getPantryIngredients().stream()
+                .anyMatch(i -> i.getId().equals(ingredient.getId()));
+
+        if (!alreadyInPantry) {
+            profile.getPantryIngredients().add(ingredient);
+        }
+    }
+
+    @Transactional
+    public void removeIngredientFromCurrentUserPantry(Long ingredientId) {
+        String currentUserId = currentUserService.getCurrentUserIdAsString();
+
+        UserProfile profile = userProfileRepository.findByUserUuid(currentUserId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "UserProfile no encontrado para userUuid: " + currentUserId));
+
+        profile.getPantryIngredients()
+                .removeIf(ingredient -> ingredient.getId().equals(ingredientId));
+    }
+
+    @Transactional
+    public Page<Ingredient> getIngredientsNotInCurrentUserPantry(Pageable pageable) {
+        String currentUserId = currentUserService.getCurrentUserIdAsString();
+
+        UserProfile profile = userProfileRepository.findByUserUuid(currentUserId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "UserProfile no encontrado para userUuid: " + currentUserId));
+
+        List<Long> idsEnPantry = profile.getPantryIngredients().stream()
+                .map(Ingredient::getId)
+                .toList();
+
+        Page<Ingredient> all = ingredientRepository.findAll(pageable);
+
+        List<Ingredient> filtrados = all.getContent().stream()
+                .filter(ing -> !idsEnPantry.contains(ing.getId()))
+                .toList();
+
+        return new PageImpl<>(filtrados, pageable, filtrados.size());
+    }
 }
