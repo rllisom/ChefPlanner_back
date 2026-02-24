@@ -25,7 +25,7 @@ import java.util.Objects;
 public class UserProfile {
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue
     private Long id;
 
     @CreatedBy

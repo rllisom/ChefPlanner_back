@@ -49,6 +49,7 @@ VALUES
     (3, 'a1b2c3d4-0000-0000-0000-000000000003')
 ON CONFLICT DO NOTHING;
 
+
 -- =============================================
 -- INGREDIENTS
 -- =============================================
@@ -65,6 +66,7 @@ VALUES
     (9, 'Pollo'),
     (10, 'Arroz')
 ON CONFLICT DO NOTHING;
+
 
 -- =============================================
 -- RECIPES
@@ -95,6 +97,7 @@ VALUES
     (4, 9, 300, 'gramos')
 ON CONFLICT DO NOTHING;
 
+
 -- =============================================
 -- USER PANTRY (despensa del usuario, ManyToMany)
 -- =============================================
@@ -117,19 +120,3 @@ VALUES
 ON CONFLICT DO NOTHING;
 
 
--- =============================================
--- SINCRONIZACIÓN DE SECUENCIAS
--- Necesario porque los INSERTs usan IDs explícitos
--- y las secuencias de PostgreSQL quedan desincronizadas
--- =============================================
-SELECT setval(pg_get_serial_sequence('user_profiles', 'id'),
-              (SELECT MAX(id) FROM user_profiles), true);
-
-SELECT setval(pg_get_serial_sequence('ingredient', 'id'),
-              (SELECT MAX(id) FROM ingredient), true);
-
-SELECT setval(pg_get_serial_sequence('recipes', 'id'),
-              (SELECT MAX(id) FROM recipes), true);
-
-SELECT setval(pg_get_serial_sequence('menu_item', 'id'),
-              (SELECT MAX(id) FROM menu_item), true);

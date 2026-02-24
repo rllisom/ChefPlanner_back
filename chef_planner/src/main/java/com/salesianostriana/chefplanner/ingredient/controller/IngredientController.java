@@ -76,7 +76,7 @@ public class IngredientController {
             ),
 
     })
-    @GetMapping("/admin/ingredient/search")
+    @GetMapping("/ingredient/search")
     public Page<IngredientResponse> filtrarIngredientes(@PageableDefault(page = 0, size = 20, sort = "name", direction = Sort.Direction.DESC) Pageable pageable,
                                                         @RequestParam(required = false) String name) {
         return ingredientService.mostrarFiltrados(name, pageable).map(IngredientResponse::of);
