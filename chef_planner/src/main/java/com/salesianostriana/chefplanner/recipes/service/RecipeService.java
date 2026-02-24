@@ -11,6 +11,7 @@ import com.salesianostriana.chefplanner.user.model.UserProfile;
 import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -52,8 +53,10 @@ public class RecipeService {
     }
 
     public Recipe findById(Long id) {
-        return repository.findById(id)
+        Recipe recipe = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Receta no encontrada"));
+        Hibernate.initialize(recipe.getIngredients()); // ← añadir
+        return recipe;
     }
 
 
@@ -72,9 +75,10 @@ public class RecipeService {
 
     @Transactional
     public Recipe edit(Long id, Recipe recipe) {
-
         Recipe originalRecipe = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Receta no encontrada"));
+
+        Hibernate.initialize(originalRecipe.getIngredients()); // ← fuerza carga
 
         originalRecipe.setTitle(recipe.getTitle());
         originalRecipe.setDescription(recipe.getDescription());
@@ -82,8 +86,8 @@ public class RecipeService {
         originalRecipe.setDifficulty(recipe.getDifficulty());
 
         return originalRecipe;
-
     }
+
     //Buscar por texto
     public List<Recipe> searchRecipesText(String texto) {
         return repository.findAll()

@@ -5,7 +5,9 @@ import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
 import com.salesianostriana.chefplanner.ingredient.repository.IngredientRepository;
 import com.salesianostriana.chefplanner.recipeingredient.dto.RecipeIngredientRequest;
 import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredient;
+import com.salesianostriana.chefplanner.recipeingredient.model.RecipeIngredientId;
 import com.salesianostriana.chefplanner.recipeingredient.repository.RecipeIngredientRepository;
+import com.salesianostriana.chefplanner.recipes.error.RecipeNotFoundException;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.recipes.service.RecipeService;
@@ -15,6 +17,7 @@ import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -33,18 +36,24 @@ public class RecipeIngredientService {
     private final UserProfileRepository userProfileRepository;
 
 
-
-    public RecipeIngredient addIngredientToRecipe(Long recipeId,RecipeIngredientRequest request){
-        Recipe recipe = recipeService.findById(recipeId);
+    @Transactional
+    public RecipeIngredient addIngredientToRecipe(Long recipeId, RecipeIngredientRequest request) {
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new RecipeNotFoundException("Receta no encontrada"));
+        Hibernate.initialize(recipe.getIngredients());
         Ingredient ingredient = ingredientRepository.findById(request.ingredientId()).orElseThrow(
                 () -> new IngredientNotFoundException(request.ingredientId()));
+        RecipeIngredientId id = new RecipeIngredientId();
+        id.setRecipeId(recipeId);
+        id.setIngredientId(request.ingredientId());
+
         RecipeIngredient recipeIngredient = RecipeIngredient.builder()
+                .id(id)
                 .recipe(recipe)
                 .ingredient(ingredient)
                 .quantity(request.quantity())
                 .unit(request.unit())
                 .build();
-        recipe.addIngredient(recipeIngredient);
         return recipeIngredientRepository.save(recipeIngredient);
     }
 
