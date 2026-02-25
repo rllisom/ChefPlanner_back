@@ -14,30 +14,29 @@ import com.salesianostriana.chefplanner.recipes.repository.RecipeRepository;
 import com.salesianostriana.chefplanner.user.model.User;
 import com.salesianostriana.chefplanner.user.model.UserProfile;
 import com.salesianostriana.chefplanner.user.model.UserRole;
-
-
 import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import com.salesianostriana.chefplanner.user.repository.UserRepository;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
+import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.CommandLineRunner;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @Component
-@Profile("local")
 @RequiredArgsConstructor
+@Log
+@Profile("dev")
 public class DataInitializer implements CommandLineRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
 
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
@@ -45,155 +44,104 @@ public class DataInitializer implements CommandLineRunner {
     private final RecipeRepository recipeRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final MenuItemRepository menuItemRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @PersistenceContext
+    private EntityManager em;
 
     @Override
     @Transactional
     public void run(String... args) {
-        if (userRepository.count() > 0) {
-            log.info("Datos iniciales ya cargados");
-            return;
-        }
+        log.info("🚀 Cargando datos de prueba...");
 
-        log.info("🚀 Iniciando carga de datos iniciales...");
+        // 1. INGREDIENTS
+        Ingredient tomate  = ingredientRepository.save(Ingredient.builder().name("Tomate").build());
+        Ingredient cebolla = ingredientRepository.save(Ingredient.builder().name("Cebolla").build());
+        Ingredient ajo     = ingredientRepository.save(Ingredient.builder().name("Ajo").build());
+        Ingredient aceite  = ingredientRepository.save(Ingredient.builder().name("Aceite de oliva").build());
+        Ingredient sal     = ingredientRepository.save(Ingredient.builder().name("Sal").build());
+        Ingredient harina  = ingredientRepository.save(Ingredient.builder().name("Harina").build());
+        Ingredient huevo   = ingredientRepository.save(Ingredient.builder().name("Huevo").build());
+        Ingredient leche   = ingredientRepository.save(Ingredient.builder().name("Leche").build());
+        Ingredient pollo   = ingredientRepository.save(Ingredient.builder().name("Pollo").build());
+        Ingredient arroz   = ingredientRepository.save(Ingredient.builder().name("Arroz").build());
 
-        // 1. USERS
-        User admin = User.builder()
-                .id(UUID.fromString("a1b2c3d4-0000-0000-0000-000000000001"))
-                .email("admin@chefplanner.com")
-                .username("admin")
-                .password("{noop}prueba123")
-                .roles(Set.of(UserRole.ADMIN))
-                .build();
-        userRepository.save(admin);
+        // 2. USERS (sin ID fijo, Hibernate genera el UUID)
+        User admin = userRepository.save(User.builder()
+                .email("admin@chefplanner.com").username("admin")
+                .password(passwordEncoder.encode("prueba123"))
+                .roles(Set.of(UserRole.ADMIN)).build());
+        User chefMaria = userRepository.save(User.builder()
+                .email("chef1@chefplanner.com").username("chef_maria")
+                .password(passwordEncoder.encode("contrasena123"))
+                .roles(Set.of(UserRole.USER)).build());
+        User chefPedro = userRepository.save(User.builder()
+                .email("chef2@chefplanner.com").username("chef_pedro")
+                .password(passwordEncoder.encode("contrasena123"))
+                .roles(Set.of(UserRole.USER)).build());
 
-        User chefMaria = User.builder()
-                .id(UUID.fromString("a1b2c3d4-0000-0000-0000-000000000002"))
-                .email("chef1@chefplanner.com")
-                .username("chef_maria")
-                .password("{noop}contrasena123")
-                .roles(Set.of(UserRole.USER))
-                .build();
-        userRepository.save(chefMaria);
-
-        User chefPedro = User.builder()
-                .id(UUID.fromString("a1b2c3d4-0000-0000-0000-000000000003"))
-                .email("chef2@chefplanner.com")
-                .username("chef_pedro")
-                .password("{noop}contrasena123")
-                .roles(Set.of(UserRole.USER))
-                .build();
-        userRepository.save(chefPedro);
-
-        // 2. USER PROFILES
-        UserProfile profileMaria = UserProfile.builder()
-                .id(2L)
-                .userUuid(chefMaria.getId().toString())
-                .build();
-        userProfileRepository.save(profileMaria);
-
-        UserProfile profilePedro = UserProfile.builder()
-                .id(3L)
-                .userUuid(chefPedro.getId().toString())
-                .build();
-        userProfileRepository.save(profilePedro);
-
-        // 3. INGREDIENTS (necesitas IngredientRepository y modelo)
-        List<Ingredient> ingredients = List.of(
-                Ingredient.builder().id(1L).name("Tomate").build(),
-                Ingredient.builder().id(2L).name("Cebolla").build(),
-                Ingredient.builder().id(3L).name("Ajo").build(),
-                Ingredient.builder().id(4L).name("Aceite de oliva").build(),
-                Ingredient.builder().id(5L).name("Sal").build(),
-                Ingredient.builder().id(6L).name("Harina").build(),
-                Ingredient.builder().id(7L).name("Huevo").build(),
-                Ingredient.builder().id(8L).name("Leche").build(),
-                Ingredient.builder().id(9L).name("Pollo").build(),
-                Ingredient.builder().id(10L).name("Arroz").build()
-        );
-        ingredientRepository.saveAll(ingredients);
+        // 3. USER PROFILES
+        UserProfile profileAdmin = userProfileRepository.save(
+                UserProfile.builder().userUuid(admin.getId().toString()).build());
+        UserProfile profileMaria = userProfileRepository.save(
+                UserProfile.builder().userUuid(chefMaria.getId().toString()).build());
+        UserProfile profilePedro = userProfileRepository.save(
+                UserProfile.builder().userUuid(chefPedro.getId().toString()).build());
 
         // 4. RECIPES
-        Recipe tortilla = Recipe.builder()
-                .id(1L)
-                .title("Tortilla Española")
-                .description("Tortilla clásica de patata y cebolla")
-                .minutes(Duration.ofMinutes(30))
-                .difficulty(Difficulty.EASY)
-                .author(profileMaria)
-                .featured(true)
-                .build();
-        recipeRepository.save(tortilla);
+        Recipe tortilla = recipeRepository.save(Recipe.builder()
+                .title("Tortilla Española").description("Tortilla clásica de patata y cebolla")
+                .minutes(Duration.ofMinutes(30)).difficulty(Difficulty.EASY)
+                .author(profileMaria).featured(true).build());
+        Recipe polloAjillo = recipeRepository.save(Recipe.builder()
+                .title("Pollo al ajillo").description("Pollo con ajo y vino blanco")
+                .minutes(Duration.ofMinutes(45)).difficulty(Difficulty.MEDIUM)
+                .author(profileMaria).featured(false).build());
+        Recipe arrozTomate = recipeRepository.save(Recipe.builder()
+                .title("Arroz con tomate").description("Arroz caldoso con sofrito de tomate")
+                .minutes(Duration.ofMinutes(25)).difficulty(Difficulty.EASY)
+                .author(profilePedro).featured(true).build());
+        Recipe croquetas = recipeRepository.save(Recipe.builder()
+                .title("Croquetas caseras").description("Croquetas de pollo con bechamel")
+                .minutes(Duration.ofMinutes(90)).difficulty(Difficulty.HARD)
+                .author(profilePedro).featured(false).build());
 
-        Recipe pollo = Recipe.builder()
-                .id(2L)
-                .title("Pollo al ajillo")
-                .description("Pollo con ajo y vino blanco")
-                .minutes(Duration.ofMinutes(45))
-                .difficulty(Difficulty.MEDIUM)
-                .author(profileMaria)
-                .build();
-        recipeRepository.save(pollo);
+        // 5. RECIPE INGREDIENTS
+        crearRecipeIngredient(tortilla,    huevo,  4,   "unidades");
+        crearRecipeIngredient(tortilla,    sal,    1,   "cucharadita");
+        crearRecipeIngredient(polloAjillo, pollo,  500, "gramos");
+        crearRecipeIngredient(polloAjillo, ajo,    6,   "dientes");
+        crearRecipeIngredient(polloAjillo, aceite, 3,   "cucharadas");
+        crearRecipeIngredient(arrozTomate, arroz,  200, "gramos");
+        crearRecipeIngredient(arrozTomate, tomate, 3,   "unidades");
+        crearRecipeIngredient(arrozTomate, cebolla,1,   "unidad");
+        crearRecipeIngredient(croquetas,   harina, 200, "gramos");
+        crearRecipeIngredient(croquetas,   leche,  500, "ml");
+        crearRecipeIngredient(croquetas,   pollo,  300, "gramos");
 
-        Recipe arroz = Recipe.builder()
-                .id(3L)
-                .title("Arroz con tomate")
-                .description("Arroz caldoso con sofrito de tomate")
-                .minutes(Duration.ofMinutes(25))
-                .difficulty(Difficulty.EASY)
-                .author(profilePedro)
-                .featured(true)
-                .build();
-        recipeRepository.save(arroz);
-
-        Recipe croquetas = Recipe.builder()
-                .id(4L)
-                .title("Croquetas caseras")
-                .description("Croquetas de pollo con bechamel")
-                .minutes(Duration.ofMinutes(90))
-                .difficulty(Difficulty.HARD)
-                .author(profilePedro)
-                .build();
-        recipeRepository.save(croquetas);
-
-        // 5. RECIPE INGREDIENTS (usando relaciones bidireccionales)
-        Ingredient tomate = ingredientRepository.findById(1L).orElseThrow();
-        Ingredient cebolla = ingredientRepository.findById(2L).orElseThrow();
-        // ... otros ingredients
-
-        RecipeIngredient tortillaHuevos = RecipeIngredient.builder()
-                .id(new RecipeIngredientId(1L, 7L))
-                .quantity(4)
-                .unit("unidades")
-                .recipe(tortilla)
-                .ingredient(ingredientRepository.findById(7L).orElseThrow())
-                .build();
-        recipeIngredientRepository.save(tortillaHuevos);
-
-        // Repite para todos los recipe_ingredient del SQL...
-
-        // 6. PANTRY (ManyToMany en UserProfile)
-        profileMaria.getPantryIngredients().addAll(List.of(
-                ingredientRepository.findById(1L).orElseThrow(),
-                ingredientRepository.findById(2L).orElseThrow(),
-                ingredientRepository.findById(3L).orElseThrow(),
-                ingredientRepository.findById(4L).orElseThrow(),
-                ingredientRepository.findById(5L).orElseThrow()
-        ));
-        userProfileRepository.save(profileMaria);
+        // 6. PANTRY
+        profileMaria.getPantryIngredients().addAll(List.of(tomate, cebolla, ajo, aceite, sal));
+        profilePedro.getPantryIngredients().addAll(List.of(sal, harina, huevo, leche));
+        userProfileRepository.saveAll(List.of(profileMaria, profilePedro));
 
         // 7. MENU ITEMS
         menuItemRepository.saveAll(List.of(
-                MenuItem.builder()
-                        .id(1L)
-                        .profile(profileMaria)
-                        .date(LocalDate.of(2026, 2, 24))
-                        .mealType(MealType.BREAKFAST) // Ajusta enum
-                        .recipe(tortilla)
-                        .build()
-
+                MenuItem.builder().profile(profileMaria).date(LocalDate.of(2026, 2, 24)).mealType(MealType.BREAKFAST).recipe(tortilla).build(),
+                MenuItem.builder().profile(profileMaria).date(LocalDate.of(2026, 2, 24)).mealType(MealType.LUNCH).recipe(polloAjillo).build(),
+                MenuItem.builder().profile(profileMaria).date(LocalDate.of(2026, 2, 25)).mealType(MealType.DINNER).recipe(arrozTomate).build(),
+                MenuItem.builder().profile(profilePedro).date(LocalDate.of(2026, 2, 24)).mealType(MealType.LUNCH).recipe(croquetas).build(),
+                MenuItem.builder().profile(profilePedro).date(LocalDate.of(2026, 2, 25)).mealType(MealType.BREAKFAST).recipe(tortilla).build()
         ));
 
-        log.info("✅ Datos cargados: {} users, {} recipes, {} ingredients",
-                userRepository.count(), recipeRepository.count(), ingredientRepository.count());
+        log.info("✅ Datos cargados correctamente.");
+    }
+
+    private void crearRecipeIngredient(Recipe recipe, Ingredient ingredient, int quantity, String unit) {
+        RecipeIngredient ri = RecipeIngredient.builder()
+                .id(new RecipeIngredientId(recipe.getId(), ingredient.getId()))
+                .quantity(quantity).unit(unit)
+                .recipe(recipe).ingredient(ingredient)
+                .build();
+        recipeIngredientRepository.save(ri);
     }
 }
