@@ -1,7 +1,7 @@
 package com.salesianostriana.chefplanner.recipes.Dto;
 
 public record FeaturedCountDTO(
-        String userUuid,
+        String username,
         long count
 ) {
 }
