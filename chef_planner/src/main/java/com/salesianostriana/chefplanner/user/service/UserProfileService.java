@@ -8,6 +8,7 @@ import com.salesianostriana.chefplanner.user.dto.UserListResponse;
 import com.salesianostriana.chefplanner.user.error.ProfileNotFoundException;
 import com.salesianostriana.chefplanner.user.model.User;
 import com.salesianostriana.chefplanner.user.model.UserProfile;
+import com.salesianostriana.chefplanner.user.model.UserRole;
 import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import com.salesianostriana.chefplanner.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,11 @@ public class UserProfileService {
     @Transactional(readOnly = true)
     public List<UserListResponse> findAll() {
         List<UserListResponse> response = userProfileRepository.findAll().stream()
+                .filter(u -> {
+                    User user = userRepository.findById(UUID.fromString(u.getUserUuid()))
+                            .orElseThrow( () -> new ProfileNotFoundException("No se encontró el perfil para el usuario con UUID: " + u.getUserUuid()));
+                    return !user.getRoles().contains(UserRole.ADMIN);
+                })
                 .map(profile -> {
                     User user = userRepository.findById(UUID.fromString(profile.getUserUuid()))
                             .orElseThrow(
@@ -54,15 +60,26 @@ public class UserProfileService {
                 .orElseThrow(() -> new ProfileNotFoundException("No se encontró el usuario asociado al perfil con ID: " + id));
 
         List<MenuItem> menus = userProfile.getMenuItems();
-        if (!menus.isEmpty()) {
-            menus.forEach(menu -> menu.setProfile(null));
+        if (menus != null && !menus.isEmpty()) {
+            menus.forEach(menu -> {
+                menu.setProfile(null);
+                menu.setRecipe(null);
+                menuItemRepository.save(menu);
+            });
         }
-        List<Recipe> recipes = userProfile.getRecipes();
-        if (!recipes.isEmpty()) {
-            recipes.forEach(recipeRepository::delete);
-        }
-        System.out.println("Se han eliminado " + menus.size() + " menús y " + recipes.size() + " recetas asociadas al perfil con ID: " + id);
 
+
+        List<Recipe> recipes = userProfile.getRecipes();
+        if (recipes != null && !recipes.isEmpty()) {
+            recipes.forEach(recipe -> {
+                List<MenuItem> menuItemList = menuItemRepository.findMenuItemByRecipe_Id(recipe.getId());
+                menuItemList.forEach(menu -> {
+                    menu.setRecipe(null);
+                    menuItemRepository.save(menu);
+                });
+                recipeRepository.save(recipe);
+            });
+        }
 
         userProfile.getMenuItems().clear();
 
