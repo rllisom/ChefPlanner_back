@@ -16,17 +16,19 @@ import com.salesianostriana.chefplanner.user.model.UserProfile;
 import com.salesianostriana.chefplanner.user.model.UserRole;
 import com.salesianostriana.chefplanner.user.repository.UserProfileRepository;
 import com.salesianostriana.chefplanner.user.repository.UserRepository;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.util.StreamUtils;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
@@ -49,10 +51,23 @@ public class DataInitializer implements CommandLineRunner {
     @PersistenceContext
     private EntityManager em;
 
+    /**
+     * Método auxiliar para cargar imágenes desde src/main/resources/static.img
+     */
+    private byte[] loadImage(String fileName) {
+        try {
+            // Se usa el path exacto que aparece en tu captura: static.img/nombre_archivo
+            return StreamUtils.copyToByteArray(new ClassPathResource("static/img/" + fileName).getInputStream());
+        } catch (IOException e) {
+            log.warning("⚠️ No se pudo cargar la imagen: " + fileName + ". Se omitirá la foto para esta receta.");
+            return null;
+        }
+    }
+
     @Override
     @Transactional
     public void run(String... args) {
-        log.info("🚀 Cargando datos de prueba...");
+        log.info("🚀 Cargando datos de prueba con imágenes...");
 
         // 1. INGREDIENTS
         Ingredient tomate  = ingredientRepository.save(Ingredient.builder().name("Tomate").build());
@@ -66,7 +81,7 @@ public class DataInitializer implements CommandLineRunner {
         Ingredient pollo   = ingredientRepository.save(Ingredient.builder().name("Pollo").build());
         Ingredient arroz   = ingredientRepository.save(Ingredient.builder().name("Arroz").build());
 
-        // 2. USERS (sin ID fijo, Hibernate genera el UUID)
+        // 2. USERS
         User admin = userRepository.save(User.builder()
                 .email("admin@chefplanner.com").username("admin")
                 .password(passwordEncoder.encode("prueba123"))
@@ -88,23 +103,39 @@ public class DataInitializer implements CommandLineRunner {
         UserProfile profilePedro = userProfileRepository.save(
                 UserProfile.builder().userUuid(chefPedro.getId().toString()).build());
 
-        // 4. RECIPES
+        // 4. RECIPES CON IMÁGENES
+        // Se cargan los bytes usando los nombres exactos de tu carpeta static.img
         Recipe tortilla = recipeRepository.save(Recipe.builder()
                 .title("Tortilla Española").description("Tortilla clásica de patata y cebolla")
                 .minutes(Duration.ofMinutes(30)).difficulty(Difficulty.EASY)
-                .author(profileMaria).featured(true).build());
+                .author(profileMaria).featured(true)
+                .coverFileData(loadImage("tortilla.jpg"))
+                .coverFileType("image/jpeg")
+                .build());
+
         Recipe polloAjillo = recipeRepository.save(Recipe.builder()
                 .title("Pollo al ajillo").description("Pollo con ajo y vino blanco")
                 .minutes(Duration.ofMinutes(45)).difficulty(Difficulty.MEDIUM)
-                .author(profileMaria).featured(false).build());
+                .author(profileMaria).featured(false)
+                .coverFileData(loadImage("polloAjillo.jpg"))
+                .coverFileType("image/jpeg")
+                .build());
+
         Recipe arrozTomate = recipeRepository.save(Recipe.builder()
                 .title("Arroz con tomate").description("Arroz caldoso con sofrito de tomate")
                 .minutes(Duration.ofMinutes(25)).difficulty(Difficulty.EASY)
-                .author(profilePedro).featured(true).build());
+                .author(profilePedro).featured(true)
+                .coverFileData(loadImage("arroTomate.jpg"))
+                .coverFileType("image/jpeg")
+                .build());
+
         Recipe croquetas = recipeRepository.save(Recipe.builder()
                 .title("Croquetas caseras").description("Croquetas de pollo con bechamel")
                 .minutes(Duration.ofMinutes(90)).difficulty(Difficulty.HARD)
-                .author(profilePedro).featured(false).build());
+                .author(profilePedro).featured(false)
+                .coverFileData(loadImage("cocretas.jfif"))
+                .coverFileType("image/jpeg") // Aunque sea .jfif, suele manejarse como jpeg
+                .build());
 
         // 5. RECIPE INGREDIENTS
         crearRecipeIngredient(tortilla,    huevo,  4,   "unidades");
@@ -133,7 +164,7 @@ public class DataInitializer implements CommandLineRunner {
                 MenuItem.builder().profile(profilePedro).date(LocalDate.of(2026, 2, 25)).mealType(MealType.BREAKFAST).recipe(tortilla).build()
         ));
 
-        log.info("✅ Datos cargados correctamente.");
+        log.info("✅ Datos cargados correctamente con imágenes.");
     }
 
     private void crearRecipeIngredient(Recipe recipe, Ingredient ingredient, int quantity, String unit) {
