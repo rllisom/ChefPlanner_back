@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface IngredientRepository extends JpaRepository<Ingredient, Long>, JpaSpecificationExecutor<Ingredient> {
 
 
-    boolean existsByName(String name);
+    boolean existsByNameIgnoreCase(String name);
+
 }
