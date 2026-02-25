@@ -83,6 +83,51 @@ public class IngredientController {
 
     }
 
+    @Operation(summary = "Obtener ingredientes de mi despensa",
+            description = "Devuelve una lista paginada de los ingredientes que el usuario actual tiene en su despensa.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de ingredientes obtenida correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "content": [
+                                                    { "id": 1, "name": "Tomate" },
+                                                    { "id": 2, "name": "Cebolla" }
+                                                ],
+                                                "totalElements": 2,
+                                                "totalPages": 1,
+                                                "size": 20,
+                                                "number": 0
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontraron ingredientes en la despensa del usuario.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "detail": "No se encontraron ingredientes en tu despensa.",
+                                                "instance": "/api/v1/ingredients",
+                                                "status": 404,
+                                                "title": "Ingredientes no encontrados",
+                                                "type": "chefplanner.com/error/ingredientes-no-encontrados"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @GetMapping("/ingredients")
     public Page<IngredientResponse> getMyPantryIngredients(
             @PageableDefault(size = 20, sort = "name") Pageable pageable) {
@@ -156,6 +201,52 @@ public class IngredientController {
         return IngredientResponse.of(ingredientService.addIngredient(request));
     }
 
+    @Operation(summary = "Eliminar un ingrediente",
+            description = "Permite a los administradores eliminar un ingrediente de la base de datos utilizando su ID.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Ingrediente eliminado correctamente"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acceso denegado. Se requiere rol ADMIN",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "detail": "No tienes permisos para acceder a este recurso",
+                                                "instance": "/api/v1/admin/ingredient/delete/{id}",
+                                                "status": 403,
+                                                "title": "Acceso denegado",
+                                                "type": "chefplanner.com/error/acceso-denegado"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontró el ingrediente con el ID proporcionado.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "detail": "No se encontró el ingrediente con ID: {id}",
+                                                "instance": "/api/v1/admin/ingredient/delete/{id}",
+                                                "status": 404,
+                                                "title": "Ingrediente no encontrado",
+                                                "type": "chefplanner.com/error/ingrediente-no-encontrado"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @DeleteMapping("/admin/ingredient/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteIngredient(@PathVariable Long id) {
@@ -247,6 +338,51 @@ public class IngredientController {
         ingredientService.removeIngredientFromCurrentUserPantry(ingredientId);
     }
 
+    @Operation(summary = "Obtener ingredientes disponibles para agregar a mi despensa",
+            description = "Devuelve una lista paginada de ingredientes que no están actualmente en la despensa del usuario, para que puedan ser agregados.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de ingredientes obtenida correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "content": [
+                                                    { "id": 3, "name": "Pimiento" },
+                                                    { "id": 4, "name": "Ajo" }
+                                                ],
+                                                "totalElements": 2,
+                                                "totalPages": 1,
+                                                "size": 20,
+                                                "number": 0
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontraron ingredientes disponibles para agregar a la despensa.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "detail": "No se encontraron ingredientes disponibles para agregar a tu despensa.",
+                                                "instance": "/api/v1/ingredients/available",
+                                                "status": 404,
+                                                "title": "Ingredientes no encontrados",
+                                                "type": "chefplanner.com/error/ingredientes-no-encontrados"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @GetMapping("/ingredients/available")
     public Page<IngredientResponse> getAvailableIngredientsForPantry(
             @PageableDefault(size = 20, sort = "name") Pageable pageable) {
