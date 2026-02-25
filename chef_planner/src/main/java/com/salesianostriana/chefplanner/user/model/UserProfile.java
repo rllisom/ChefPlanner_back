@@ -5,10 +5,7 @@ import com.salesianostriana.chefplanner.ingredient.model.Ingredient;
 import com.salesianostriana.chefplanner.menuitem.model.MenuItem;
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.data.annotation.CreatedBy;
 
@@ -18,7 +15,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "user_profiles")
-@Data
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,7 +25,7 @@ public class UserProfile {
     @GeneratedValue
     private Long id;
 
-    @CreatedBy
+//    @CreatedBy
     @Column(nullable = false, unique = true)
     private String userUuid;
 
