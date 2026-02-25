@@ -1,8 +1,10 @@
 package com.salesianostriana.chefplanner.user.controller;
 
 import com.salesianostriana.chefplanner.user.dto.UserListResponse;
+import com.salesianostriana.chefplanner.user.model.UserProfile;
 import com.salesianostriana.chefplanner.user.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class UserProfileController {
                                                    ]
                                                  }
                                             [
-                                                """
+                                            """
                             )
                     )
             ),
@@ -66,13 +65,44 @@ public class UserProfileController {
                                               "detail": "No se encontraron perfiles de usuario."
                                             }
                                             """
+                            )
                     )
-                )
             )
     })
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/users")
     public ResponseEntity<List<UserListResponse>> getAllUsers() {
         return ResponseEntity.ok(userProfileService.findAll());
+    }
+
+
+    @DeleteMapping("/admin/delete/user/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Eliminar un usuario por ID", description = "Elimina un usuario específico del sistema utilizando su ID. " +
+            "Esta operación también eliminará el perfil de usuario asociado, las recetas, los ingredientes de la despensa y los menús relacionados con ese usuario.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Usuario eliminado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "No se encontró el perfil de usuario con el ID proporcionado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "type": "https://example.com/profilenotfound",
+                                              "title": "Perfil no encontrado",
+                                              "status": 404,
+                                              "detail": "No se encontró el perfil de usuario con ID: 999"           
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<Void> deleteUserById(
+            @Parameter(description = "ID del usuario a eliminar", example = "1")
+            @PathVariable Long id) {
+        userProfileService.deleteProfileById(id);
+        return ResponseEntity.noContent().build();
     }
 }

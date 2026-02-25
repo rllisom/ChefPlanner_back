@@ -27,7 +27,7 @@ public class MenuItem {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private UserProfile profile;
 
     @Column(name = "date", nullable = false)

@@ -59,8 +59,11 @@ public class IngredientService {
         String currentUserId = currentUserService.getCurrentUserIdAsString();
 
         UserProfile profile = userProfileRepository.findByUserUuid(currentUserId)
-                .orElseThrow(() -> new IllegalStateException(
-                        "UserProfile no encontrado para userUuid: " + currentUserId));
+                .orElse(null);
+
+        if (profile == null || profile.getPantryIngredients().isEmpty()) {
+            return Page.empty(pageable);
+        }
 
         List<Ingredient> ingredients = profile.getPantryIngredients();
 
@@ -123,19 +126,12 @@ public class IngredientService {
         String currentUserId = currentUserService.getCurrentUserIdAsString();
 
         UserProfile profile = userProfileRepository.findByUserUuid(currentUserId)
-                .orElseThrow(() -> new IllegalStateException(
-                        "UserProfile no encontrado para userUuid: " + currentUserId));
+                .orElse(null);
 
-        List<Long> idsEnPantry = profile.getPantryIngredients().stream()
-                .map(Ingredient::getId)
-                .toList();
+        if (profile == null || profile.getPantryIngredients().isEmpty()) {
+            return ingredientRepository.findAll(pageable);
+        }
 
-        Page<Ingredient> all = ingredientRepository.findAll(pageable);
-
-        List<Ingredient> filtrados = all.getContent().stream()
-                .filter(ing -> !idsEnPantry.contains(ing.getId()))
-                .toList();
-
-        return new PageImpl<>(filtrados, pageable, filtrados.size());
+        return ingredientRepository.findIngredientsNotInPantry(currentUserId, pageable);
     }
 }
