@@ -7,6 +7,7 @@ import com.salesianostriana.chefplanner.menuitem.model.MealType;
 import com.salesianostriana.chefplanner.menuitem.service.MenuItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -50,14 +51,57 @@ public class MenuItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(MenuItemResponse.of(menuItemService.create(request)));
     }
 
-    @Operation(summary = "Obtener planificación entre dos fechas")
+    @Operation(summary = "Obtener planificación entre dos fechas",
+            description = "Devuelve una lista de MenuItem planificados entre las fechas indicadas, ordenados por fecha y tipo de comida.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista de MenuItem entre fechas",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MenuItemResponse.class))),
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MenuItemResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            [
+                                                {
+                                                    "id": 1,
+                                                    "date": "2024-09-23",
+                                                    "mealType": "LUNCH",
+                                                    "receta": {
+                                                        "id": 1,
+                                                        "title": "Tortilla Española",
+                                                        ...
+                                                    }
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "date": "2024-09-24",
+                                                    "mealType": "DINNER",
+                                                    "receta": {
+                                                        "id": 2,
+                                                        "title": "Ensalada César",
+                                                        ...
+                                                    }
+                                                }
+                                            ]
+                                            """
+                                )
+                    )
+            ),
             @ApiResponse(responseCode = "400", description = "Rango de fechas no válido",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ProblemDetail.class)))
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "type": "https://example.com/invaliddaterange",
+                                              "title": "Rango de fechas no válido",
+                                              "status": 400,
+                                              "detail": "La fecha de inicio debe ser anterior a la fecha de fin."
+                                            }
+                                            """
+                            )
+
+                    )
+            ),
     })
     @GetMapping("/menuitem")
     public ResponseEntity<List<MenuItemResponse>> getByRange(
