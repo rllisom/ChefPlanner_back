@@ -1,6 +1,7 @@
 package com.salesianostriana.chefplanner.user.controller;
 
 import com.salesianostriana.chefplanner.user.dto.UserListResponse;
+import com.salesianostriana.chefplanner.user.model.UserProfile;
 import com.salesianostriana.chefplanner.user.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -75,4 +76,5 @@ public class UserProfileController {
     public ResponseEntity<List<UserListResponse>> getAllUsers() {
         return ResponseEntity.ok(userProfileService.findAll());
     }
+
 }
