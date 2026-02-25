@@ -93,7 +93,7 @@ public class FileController {
         return builder.body(resource);
     }
 
-    @PutMapping(value = "/{id}/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "recipe/{id}/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Subir o actualizar la imagen de portada de una receta",
             description = "Recibe un archivo de imagen, extrae sus bytes y los almacena en el campo LOB de la base de datos.")
     @ApiResponses({
@@ -126,4 +126,36 @@ public class FileController {
                 .orElse("Usuario Desconocido");
         return ResponseEntity.ok(RecipeDetailsResponse.fromEntity(savedRecipe, authorUsername));
     }
+
+    @Operation(
+            summary = "Obtener la foto de portada de una receta",
+            description = "Devuelve los bytes de la imagen de portada almacenada en la base de datos para la receta indicada"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Imagen de portada devuelta correctamente",
+                    content = @Content(mediaType = "image/*", schema = @Schema(type = "string", format = "binary"))
+            ),
+            @ApiResponse(responseCode = "404", description = "Receta no encontrada o sin imagen de portada")
+    })
+    @GetMapping("/recipe/{id}/cover")
+    public ResponseEntity<byte[]> getCover(
+            @Parameter(description = "ID de la receta", example = "1")
+            @PathVariable Long id) {
+        Recipe recipe = recipeService.findById(id);
+
+        if (recipe.getCoverFileData() == null || recipe.getCoverFileData().length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String contentType = recipe.getCoverFileType() != null
+                ? recipe.getCoverFileType()
+                : "image/jpeg";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .body(recipe.getCoverFileData());
+    }
+
 }
