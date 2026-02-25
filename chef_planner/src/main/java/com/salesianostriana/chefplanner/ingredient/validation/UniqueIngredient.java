@@ -5,13 +5,13 @@ import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.METHOD,ElementType.FIELD})
+@Target({ElementType.METHOD,ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = UniqueIngredientValidator.class)
 @Documented
 public @interface UniqueIngredient {
 
-    String message () default "precio fuera de rango";
+    String message () default "El nombre del ingrediente ya existe";
 
     Class<?>[] groups() default {};
 
