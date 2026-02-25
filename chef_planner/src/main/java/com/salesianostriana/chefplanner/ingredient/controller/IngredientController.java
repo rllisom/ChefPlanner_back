@@ -197,7 +197,7 @@ public class IngredientController {
     })
     @PostMapping("/admin/ingredient/add")
     @PreAuthorize("hasRole('ADMIN')")
-    public IngredientResponse addIngredient(@RequestBody IngredientRequest request) {
+    public IngredientResponse addIngredient(@jakarta.validation.Valid @RequestBody IngredientRequest request) {
         return IngredientResponse.of(ingredientService.addIngredient(request));
     }
 

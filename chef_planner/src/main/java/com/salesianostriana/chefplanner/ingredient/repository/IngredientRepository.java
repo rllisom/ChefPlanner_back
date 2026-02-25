@@ -17,4 +17,6 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long>, J
     @Query("SELECT i FROM Ingredient i WHERE i.id NOT IN " +
             "(SELECT pi.id FROM UserProfile up JOIN up.pantryIngredients pi WHERE up.userUuid = :uuid)")
     Page<Ingredient> findIngredientsNotInPantry(@Param("uuid") String uuid, Pageable pageable);
+    boolean existsByNameIgnoreCase(String name);
+
 }

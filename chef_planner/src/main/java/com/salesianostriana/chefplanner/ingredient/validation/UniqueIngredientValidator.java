@@ -12,7 +12,7 @@ public class UniqueIngredientValidator implements ConstraintValidator<UniqueIngr
     private IngredientRepository ingredientRepository;
 
     @Override
-    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        return StringUtils.hasText(s) && ingredientRepository.existsByName(s);
+    public boolean isValid(String s, ConstraintValidatorContext context) {
+        return StringUtils.hasText(s) && !ingredientRepository.existsByNameIgnoreCase(s);
     }
 }
