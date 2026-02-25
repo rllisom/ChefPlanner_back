@@ -1,3 +1,4 @@
+#!/bin/sh
 set -eu
 
 if [ "${SPRING_DATASOURCE_PASSWORD:-}" = "" ] && [ -n "${SPRING_DATASOURCE_PASSWORD_FILE:-}" ]; then

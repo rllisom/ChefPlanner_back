@@ -2,10 +2,7 @@
 FROM maven:3-eclipse-temurin-21 AS build
 WORKDIR /app
 
-
 COPY pom.xml .
-
-
 
 RUN mvn -DskipTests dependency:go-offline
 
