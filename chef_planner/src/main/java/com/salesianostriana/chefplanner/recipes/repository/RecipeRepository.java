@@ -29,12 +29,17 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long>, JpaSpecif
     @Query(value = "SELECT AVG(EXTRACT(EPOCH FROM minutes)) FROM recipes", nativeQuery = true)
     Double getAverageDuration();
 
+// En RecipeRepository.java
+
+// En RecipeRepository.java
+
     @Query("""
-       SELECT new com.salesianostriana.chefplanner.recipes.Dto.FeaturedCountDTO(r.author.userUuid, COUNT(r))
-       FROM Recipe r
-       WHERE r.featured = true
-       GROUP BY r.author.userUuid
-       """)
+   SELECT new com.salesianostriana.chefplanner.recipes.Dto.FeaturedCountDTO(u.username, COUNT(r))
+   FROM Recipe r
+   JOIN User u ON r.author.userUuid = CAST(u.id AS string)
+   WHERE r.featured = true
+   GROUP BY u.username
+   """)
     List<FeaturedCountDTO> countFeaturedRecipesPerUser();
 
     @Query("SELECT r FROM Recipe r JOIN FETCH r.author")
