@@ -81,7 +81,7 @@ public class RecipeService {
         Recipe originalRecipe = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Receta no encontrada"));
 
-        Hibernate.initialize(originalRecipe.getIngredients()); // ← fuerza carga
+        Hibernate.initialize(originalRecipe.getIngredients());
 
         originalRecipe.setTitle(recipe.getTitle());
         originalRecipe.setDescription(recipe.getDescription());
