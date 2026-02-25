@@ -37,4 +37,11 @@ public class UserProfileService {
 
         return response;
     }
+
+    @Transactional
+    public void deleteByUuid(UUID uuid) {
+        User user = userRepository.findById(uuid)
+                .orElseThrow(() -> new ProfileNotFoundException("No se encontró el usuario con UUID: " + uuid));
+        userRepository.delete(user);
+    }
 }
