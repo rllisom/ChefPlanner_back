@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false, unique = true)
