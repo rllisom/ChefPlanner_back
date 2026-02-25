@@ -14,6 +14,8 @@ RUN mvn -DskipTests package
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+RUN mkdir ./uploads
+
 RUN addgroup -S spring && adduser -S spring -G spring
 
 COPY --from=build /app/target/*.jar /app/app.jar
