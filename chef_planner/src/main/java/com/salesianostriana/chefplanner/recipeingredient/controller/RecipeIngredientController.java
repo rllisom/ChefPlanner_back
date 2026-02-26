@@ -112,6 +112,36 @@ public class RecipeIngredientController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Obtiene los ingredientes de una receta",
+            description = "Devuelve una lista con todos los ingredientes asociados a una receta específica mediante su ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de ingredientes recuperada con éxito",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = RecipeIngredientResponse.class)) }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontró la receta con el ID proporcionado",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "ID de receta inválido",
+                    content = @Content
+            )
+    })
+    @GetMapping("recipe/{id}/ingredients")
+    public ResponseEntity<List<RecipeIngredientResponse>> obtenerRecipeIngredient(
+            @PathVariable
+            Long id)
+    {
+        return ResponseEntity.ok(recipeIngredientService.obtenerRecipeIngredients(id).stream().map(RecipeIngredientResponse::of).toList());
+    }
+
     @Operation(summary = "Añadir ingrediente a receta")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ingrediente añadido correctamente",
