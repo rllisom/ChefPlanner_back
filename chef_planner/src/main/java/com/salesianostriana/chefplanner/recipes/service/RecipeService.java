@@ -58,12 +58,11 @@ public class RecipeService {
     public Recipe findById(Long id) {
         Recipe recipe = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Receta no encontrada"));
-        Hibernate.initialize(recipe.getIngredients()); // ← añadir
+        Hibernate.initialize(recipe.getIngredients());
         return recipe;
     }
 
 
-    //filtro
     public List<Recipe> buscarRecetasConDTO(RecipeSearchRequest search) {
 
         Duration duration = (search.maxMinutes() != null)
@@ -81,7 +80,7 @@ public class RecipeService {
         Recipe originalRecipe = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Receta no encontrada"));
 
-        Hibernate.initialize(originalRecipe.getIngredients()); // ← fuerza carga
+        Hibernate.initialize(originalRecipe.getIngredients());
 
         originalRecipe.setTitle(recipe.getTitle());
         originalRecipe.setDescription(recipe.getDescription());
@@ -91,7 +90,6 @@ public class RecipeService {
         return originalRecipe;
     }
 
-    //Buscar por texto
     public List<Recipe> searchRecipesText(String texto) {
         return repository.findAll()
                 .stream()
@@ -139,7 +137,6 @@ public class RecipeService {
     }
 
 
-    //Eliminar receta (ADMIN y User)
     @Transactional
     public void deleteRecipe(Long id) {
         if (!repository.existsById(id)) {

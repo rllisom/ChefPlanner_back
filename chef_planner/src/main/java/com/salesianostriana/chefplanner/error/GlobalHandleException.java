@@ -28,16 +28,16 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalHandleException extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(BadCredentialsException.class)  // ← Específico para credenciales
+    @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("success", "false");
         error.put("error", "bad_credentials");
-        error.put("message", "Usuario o contraseña incorrectos");  // ← Mensaje amigable
+        error.put("message", "Usuario o contraseña incorrectos");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
-    @ExceptionHandler(UsernameNotFoundException.class)  // ← Usuario no existe
+    @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleUserNotFound(UsernameNotFoundException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("success", "false");
