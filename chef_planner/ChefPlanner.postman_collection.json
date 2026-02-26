@@ -1,0 +1,459 @@
+{
+  "info": {
+    "_postman_id": "437305ba-b174-4c92-9fc9-64bdef6affa7",
+    "name": "ChefPlanner",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50169652",
+    "_collection_link": "https://go.postman.co/collection/50169652-437305ba-b174-4c92-9fc9-64bdef6affa7?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1. Validate response status is 201 (or 2xx)",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response status is 2xx\", function () {",
+                  "    pm.response.to.be.success;",
+                  "});",
+                  "",
+                  "// 2. Parse the JSON response",
+                  "let jsonData;",
+                  "try {",
+                  "    jsonData = pm.response.json();",
+                  "    console.log(\"Response parsed successfully:\", JSON.stringify(jsonData));",
+                  "} catch (e) {",
+                  "    console.error(\"Failed to parse JSON response:\", e.message);",
+                  "}",
+                  "",
+                  "// 3. Check that the token field exists in the response",
+                  "pm.test(\"Token field exists in response\", function () {",
+                  "    pm.expect(jsonData).to.have.property(\"token\");",
+                  "    pm.expect(jsonData.token).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "// 4. Save the token to the environment variable \"TOKEN\"",
+                  "if (jsonData && jsonData.token) {",
+                  "    pm.environment.set(\"TOKEN\", jsonData.token);",
+                  "    // 5. Log a success message",
+                  "    console.log(\"✅ TOKEN saved to environment successfully:\", jsonData.token);",
+                  "} else {",
+                  "    // 5. Log an error message",
+                  "    console.error(\"❌ Failed to save TOKEN: token field not found in response.\");",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"chef_maria\",\n    \"password\": \"contrasena123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/auth/login",
+              "host": [
+                "{{API_BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"prueba123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{API_BASE_URL}}/auth/login",
+                  "host": [
+                    "{{API_BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "",
+              "header": [],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Register",
+      "item": [
+        {
+          "name": "Registrar un usuario",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\" : \"user2@user.com\",\n    \"username\": \"user1223\",\n    \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/auth/register",
+              "host": [
+                "{{API_BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Request",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"id\": 1,\r\n  \"username\": \"chef_maria\",\r\n  \"email\": \"chef1@chefplanner.com\",\r\n  \"uuid\": \"a1b2c3d4-0000-0000-0000-000000000002\"\r\n\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/api/v1/admin/users",
+              "host": [
+                "{{API_BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Recetas",
+      "item": [
+        {
+          "name": "ObtenerRecetasUsuario",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{API_BASE_URL}}/recipe/recetasUsuario/a1b2c3d4-0000-0000-0000-000000000002",
+              "host": [
+                "{{API_BASE_URL}}"
+              ],
+              "path": [
+                "recipe",
+                "recetasUsuario",
+                "a1b2c3d4-0000-0000-0000-000000000002"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar receta",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{API_BASE_URL}}/recipe/delete/1",
+              "host": [
+                "{{API_BASE_URL}}"
+              ],
+              "path": [
+                "recipe",
+                "delete",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Menu",
+      "item": [
+        {
+          "name": "Agregar receta a menu",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-02-23\",\n  \"mealType\": \"LUNCH\",\n  \"recipeId\": 2,\n  \"profile_Id\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/menuitem",
+              "host": [
+                "{{API_BASE_URL}}"
+              ],
+              "path": [
+                "menuitem"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RecetaIngrediente",
+      "item": [
+        {
+          "name": "Lista de la compra",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{API_BASE_URL}}/ingredient/shopping/basket",
+              "host": [
+                "{{API_BASE_URL}}"
+              ],
+              "path": [
+                "ingredient",
+                "shopping",
+                "basket"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ingredientes",
+      "item": [
+        {
+          "name": "Admin",
+          "item": [
+            {
+              "name": "Obtener ingredientes en la bd",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{API_BASE_URL}}/admin/ingredient",
+                  "host": [
+                    "{{API_BASE_URL}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "ingredient"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Agregar ingrediente a la BD",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\" : \"Azúcar\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{API_BASE_URL}}/admin/ingredient/add",
+                  "host": [
+                    "{{API_BASE_URL}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "ingredient",
+                    "add"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar ingrediente",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\" : \"Azúcar\"\n}"
+                },
+                "url": {
+                  "raw": "{{API_BASE_URL}}/admin/ingredient/search?name=lec",
+                  "host": [
+                    "{{API_BASE_URL}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "ingredient",
+                    "search"
+                  ],
+                  "query": [
+                    {
+                      "key": "name",
+                      "value": "lec"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Usuario",
+      "item": [
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\" : \"user2@user.com\",\n    \"username\": \"user1223\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/admin/delete/user/3",
+              "host": [
+                "{{API_BASE_URL}}"
+              ],
+              "path": [
+                "admin",
+                "delete",
+                "user",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{TOKEN}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "API_BASE_URL",
+      "value": ""
+    },
+    {
+      "key": "TOKEN",
+      "value": ""
+    }
+  ]
+}
