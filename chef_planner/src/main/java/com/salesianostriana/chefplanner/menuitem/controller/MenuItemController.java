@@ -55,6 +55,7 @@ public class MenuItemController {
                             )
                     )
             ),
+
             @ApiResponse(responseCode = "400", description = "Datos inválidos o ya existe planificación para ese día/tipo",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class),
@@ -70,6 +71,7 @@ public class MenuItemController {
                             )
                     )
             ),
+
             @ApiResponse(responseCode = "404", description = "Receta no encontrada",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class),
@@ -139,6 +141,7 @@ public class MenuItemController {
                                             }
                                             """
                             )
+
                     )
             )
     })

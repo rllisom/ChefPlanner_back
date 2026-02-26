@@ -1,6 +1,7 @@
 package com.salesianostriana.chefplanner.menuitem.model;
 
 import com.salesianostriana.chefplanner.menuitem.model.MealType;
+
 import com.salesianostriana.chefplanner.recipes.model.Recipe;
 import com.salesianostriana.chefplanner.user.model.UserProfile;
 import jakarta.persistence.*;
