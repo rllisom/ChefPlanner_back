@@ -46,31 +46,43 @@ public class RecipeIngredientController {
                             array = @ArraySchema(schema = @Schema(implementation = CompraRecipeIngredient.class)),
                             examples = @ExampleObject(
                                     value = """
-                                        [
-                                            { "name": "Tomate", "totalQuantity": 5 },
-                                            { "name": "Harina", "totalQuantity": 200 },
-                                            { "name": "Huevo", "totalQuantity": 3 }
-                                        ]
-                                        """
+                                            [
+                                                {
+                                                    "ingredientName": "Tomate",
+                                                    "quantityTotal": 5.0,
+                                                    "unit": "kg"
+                                                },
+                                                {
+                                                    "ingredientName": "Harina",
+                                                    "quantityTotal": 200.0,
+                                                    "unit": "g"
+                                                },
+                                                {
+                                                    "ingredientName": "Huevo",
+                                                    "quantityTotal": 3.0,
+                                                    "unit": "ud"
+                                                }
+                                            ]
+                                            """
                             )
                     )
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "No se ha encontrado el usuario",
+                    description = "No se encontraron ingredientes en las recetas del usuario",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "detail": "No se ha encontrado el usuario con id 5",
-                                            "instance": "/api/v1/ingredient/shopping/basket/5",
-                                            "status": 404,
-                                            "title": "Entidad no encontrada",
-                                            "type": "chefplanner.com/error/no-encontrado"
-                                        }
-                                        """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontraron ingredientes en tus recetas",
+                                                "instance": "/api/v1/ingredient/shopping/basket"
+                                            }
+                                            """
                             )
                     )
             )
@@ -102,38 +114,54 @@ public class RecipeIngredientController {
 
     @Operation(summary = "Añadir ingrediente a receta")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ingrediente añadido correctamente"),
-            @ApiResponse(responseCode = "404", description = "Error al obtener la receta",
+            @ApiResponse(responseCode = "200", description = "Ingrediente añadido correctamente",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ProblemDetail.class),
+                            schema = @Schema(implementation = RecipeIngredientResponse.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "detail": "No se ha encontrado la receta con id 4",
-                                            "instance": "/api/v1/recipe/4/ingredient",
-                                            "status": 404,
-                                            "title": "Entidad no encontrada",
-                                            "type": "chefplanner.com/error/no-encontrado"
-                                        }
-                                    """
+                                            {
+                                                "id": 1,
+                                                "ingredientName": "Espaguetis",
+                                                "quantity": 200.0,
+                                                "unit": "g",
+                                                "recipeId": 1
+                                            }
+                                            """
                             )
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "Error al obtener el ingrediente",
+            @ApiResponse(responseCode = "404", description = "Receta no encontrada",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "detail": "No se ha encontrado el ingrediente con id 2",
-                                            "instance": "/api/v1/recipe/1/ingredient",
-                                            "status": 400,
-                                            "title": "Entidad no encontrada",
-                                            "type": "chefplanner.com/error/no-encontrado"
-                                        }
-                                    """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se ha encontrado la receta con id 4",
+                                                "instance": "/api/v1/recipe/4/ingredient"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "Ingrediente no encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 400,
+                                                "detail": "No se ha encontrado el ingrediente con id 2",
+                                                "instance": "/api/v1/recipe/1/ingredient"
+                                            }
+                                            """
                             )
                     )
             )
@@ -150,40 +178,40 @@ public class RecipeIngredientController {
         return ResponseEntity.ok(RecipeIngredientResponse.of(recipeIngredientService.addIngredientToRecipe(recipeId,request)));
     }
 
-    @Operation(summary = "Eliminar película")
+    @Operation(summary = "Eliminar ingrediente de receta")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Ingrediente eliminado correctamente"),
-            @ApiResponse(responseCode = "404", description = "Error al obtener la receta",
+            @ApiResponse(responseCode = "404", description = "Receta no encontrada",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "detail": "No se ha encontrado la receta con id 4",
-                                            "instance": "/api/v1/recipe/1/ingredient/3",
-                                            "status": 404,
-                                            "title": "Entidad no encontrada",
-                                            "type": "recipe-ingredient.com/error/no-encontrado"
-                                        }
-                                    """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se ha encontrado la receta con id 4",
+                                                "instance": "/api/v1/recipe/1/ingredient/3"
+                                            }
+                                            """
                             )
                     )
             ),
-            @ApiResponse(responseCode = "404", description = "Error al obtener el ingrediente",
+            @ApiResponse(responseCode = "404", description = "Ingrediente no encontrado en la receta",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class),
                             examples = @ExampleObject(
                                     value = """
-                                        {
-                                            "detail": "No se ha encontrado el ingrediente con id 2",
-                                            "instance": "/api/v1/recipe/1/ingredient/3",
-                                            "status": 404,
-                                            "title": "Entidad no encontrada",
-                                            "type": "recipe-ingredient.com/error/no-encontrado"
-                                        }
-                                    """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se ha encontrado el ingrediente con id 2 en la receta",
+                                                "instance": "/api/v1/recipe/1/ingredient/3"
+                                            }
+                                            """
                             )
                     )
             )

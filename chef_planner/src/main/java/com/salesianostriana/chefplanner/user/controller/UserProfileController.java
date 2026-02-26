@@ -43,11 +43,11 @@ public class UserProfileController {
                                                      {
                                                        "id": 1,
                                                        "title": "Tortilla Española",
-                                                       ...
+                                                       "minutes": 20
                                                      }
                                                    ]
                                                  }
-                                            [
+                                            ]
                                             """
                             )
                     )

@@ -326,6 +326,31 @@ public class IngredientController {
 
     @Operation(summary = "Añadir un ingrediente a mi despensa",
             description = "Añade un ingrediente existente a la despensa del usuario actual, evitando duplicados.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Ingrediente añadido a la despensa correctamente"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontró el ingrediente con el ID proporcionado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "detail": "No se encontró el ingrediente con ID: 999",
+                                                "instance": "/api/v1/pantry/999",
+                                                "status": 404,
+                                                "title": "Ingrediente no encontrado",
+                                                "type": "chefplanner.com/error/ingrediente-no-encontrado"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @PostMapping("/pantry/{ingredientId}")
     public void addIngredientToMyPantry(@PathVariable Long ingredientId) {
         ingredientService.addIngredientToCurrentUserPantry(ingredientId);
@@ -333,6 +358,31 @@ public class IngredientController {
 
     @Operation(summary = "Eliminar un ingrediente de mi despensa",
             description = "Elimina un ingrediente de la despensa del usuario actual.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Ingrediente eliminado de la despensa correctamente"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontró el ingrediente con el ID proporcionado en la despensa del usuario",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "detail": "No se encontró el ingrediente con ID: 999 en tu despensa",
+                                                "instance": "/api/v1/pantry/999",
+                                                "status": 404,
+                                                "title": "Ingrediente no encontrado",
+                                                "type": "chefplanner.com/error/ingrediente-no-encontrado"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @DeleteMapping("/pantry/{ingredientId}")
     public void removeIngredientFromMyPantry(@PathVariable Long ingredientId) {
         ingredientService.removeIngredientFromCurrentUserPantry(ingredientId);
