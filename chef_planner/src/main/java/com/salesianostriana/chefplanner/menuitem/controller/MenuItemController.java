@@ -38,10 +38,39 @@ public class MenuItemController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "MenuItem creado",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MenuItemResponse.class))),
+                            schema = @Schema(implementation = MenuItemResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "id": 1,
+                                                "date": "2024-09-23",
+                                                "mealType": "LUNCH",
+                                                "receta": {
+                                                    "id": 1,
+                                                    "title": "Tortilla Española",
+                                                    ...
+                                                }
+                                            }
+                                            """
+                            )
+                    )
+            ),
             @ApiResponse(responseCode = "400", description = "Datos inválidos o ya existe planificación para ese día/tipo",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ProblemDetail.class))),
+                            schema = @Schema(implementation = ProblemDetail.class)
+                            ,examples = @ExampleObject(
+                                    value = """
+                                             {
+                                                "detail": "El campo 'name' es obligatorio y no puede estar vacío",
+                                                "instance": "/api/v1/ingredient/add",
+                                                "status": 400,
+                                                "title": "Solicitud inválida",
+                                                "type": "chefplanner.com/error/solicitud-invalida"
+                                            }
+                                            """
+                    )
+                )
+            ),
             @ApiResponse(responseCode = "404", description = "Receta no encontrada",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class)))
@@ -114,7 +143,7 @@ public class MenuItemController {
                         .map(MenuItemResponse::of)
                         .toList());
     }
-
+    @DeleteMapping("/menuitem")
     @Operation(summary = "Eliminar planificación de un día y tipo de comida")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "MenuItem eliminado"),
@@ -125,7 +154,6 @@ public class MenuItemController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ProblemDetail.class)))
     })
-    @DeleteMapping("/menuitem")
     public ResponseEntity<Void> delete(
             @RequestParam LocalDate date,
             @RequestParam MealType mealType) {
