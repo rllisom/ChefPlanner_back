@@ -5,7 +5,7 @@ import com.salesianostriana.chefplanner.menuitem.model.MenuItem;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
-
+@Schema(description = "Respuesta que representa un elemento de menú planificado")
 public record MenuItemResponse(
         @Schema(description = "ID del menuItem", example = "1")
         Long id,

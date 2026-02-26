@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
+@Schema(description = "Datos necesarios para planificar un MenuItem")
 public record MenuItemRequest(
 
         @Schema(description = "Fecha del elemento de menú", example = "2026-02-25")
