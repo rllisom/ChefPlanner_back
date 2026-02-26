@@ -72,6 +72,10 @@ public class RecipeIngredientService {
         }
     }
 
+    public List<RecipeIngredient> obtenerRecipeIngredients(Long id ){
+        return recipeIngredientRepository.findByRecipe_Id(id);
+    }
+
     @Transactional
     public List<RecipeIngredient> mostrarIngredientesRecetas(UUID idUser){
         List<RecipeIngredient> ingredientesReceta = new ArrayList<>();
