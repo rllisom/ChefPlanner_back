@@ -62,11 +62,10 @@ public class FileController {
                             examples = @ExampleObject(
                                     value = """
                                             {
-                                                "detail": "No se ha encontrado el fichero",
-                                                "instance": "/api/v1/files/ejemplo.txt",
+                                                "type": "gestorficheros.com/error/storage-error",
+                                                "title": "Error en el almacenamiento de ficheros",
                                                 "status": 404,
-                                                "title": "Entidad no encontrada",
-                                                "type": "gestorficheros.com/error/no-encontrado"
+                                                "detail": "No se ha encontrado el fichero solicitado"
                                             }
                                             """
                             )
@@ -100,10 +99,67 @@ public class FileController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Imagen de portada actualizada con éxito",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RecipeDetailsResponse.class))
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecipeDetailsResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "id": 1,
+                                                "title": "Pasta Carbonara Tradicional",
+                                                "description": "Una receta clásica italiana con guanciale y pecorino",
+                                                "minutes": 15,
+                                                "difficulty": "MEDIUM",
+                                                "featured": true,
+                                                "authorName": "Chef Pro",
+                                                "ingredients": [
+                                                    {
+                                                        "name": "Espaguetis",
+                                                        "quantity": 200.0,
+                                                        "unit": "g"
+                                                    }
+                                                ]
+                                            }
+                                            """
+                            )
+                    )
             ),
-            @ApiResponse(responseCode = "400", description = "Archivo no válido"),
-            @ApiResponse(responseCode = "404", description = "Receta no encontrada")
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Archivo no válido o vacío",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error/solicitud-invalida",
+                                                "title": "Solicitud inválida",
+                                                "status": 400,
+                                                "detail": "El fichero proporcionado está vacío o no es válido"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Receta no encontrada",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontró la receta con ID: 999"
+                                            }
+                                            """
+                            )
+                    )
+            )
     })
     public ResponseEntity<RecipeDetailsResponse> uploadCover(
             @Parameter(description = "ID de la receta", example = "1")
@@ -137,7 +193,24 @@ public class FileController {
                     description = "Imagen de portada devuelta correctamente",
                     content = @Content(mediaType = "image/*", schema = @Schema(type = "string", format = "binary"))
             ),
-            @ApiResponse(responseCode = "404", description = "Receta no encontrada o sin imagen de portada")
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Receta no encontrada o sin imagen de portada",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontró la receta con ID: 999 o no tiene imagen de portada"
+                                            }
+                                            """
+                            )
+                    )
+            )
     })
     @GetMapping("/recipe/{id}/cover")
     public ResponseEntity<byte[]> getCover(

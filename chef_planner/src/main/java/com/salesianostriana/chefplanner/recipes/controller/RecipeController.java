@@ -116,7 +116,7 @@ public class RecipeController {
                                     {
                                         "id": 1,
                                         "title": "Pasta Carbonara Tradicional",
-                                        "description": "Una receta clásica italiana...",
+                                        "description": "Una receta clásica italiana con guanciale y pecorino",
                                         "minutes": 15,
                                         "difficulty": "MEDIUM",
                                         "featured": true,
@@ -140,7 +140,20 @@ public class RecipeController {
             @ApiResponse(
                     responseCode = "404",
                     description = "La receta solicitada no existe",
-                    content = @Content
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = org.springframework.http.ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontró la receta con ID: 999"
+                                            }
+                                            """
+                            )
+                    )
             )
     })
     public RecipeDetailsResponse findById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
@@ -155,16 +168,15 @@ public class RecipeController {
     //metodo todas recetas admin
     @PreAuthorize("hasRole('ADMIN')") // Solo permite el acceso si el usuario tiene ROLE_ADMIN [Conversación previa]
     @GetMapping("/admin/recipes")
-    @Operation(summary = "Endpoint para obtener todas las recetas paginadas para la vista de admin",
-            description = "Devuelve una página de recetas con información básica. ")
+    @Operation(summary = "Obtener todas las recetas paginadas (Admin)",
+            description = "Devuelve una página de recetas con información básica. Solo accesible para administradores.")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "Se han encontrado recetas",
                     content = @Content(
                             mediaType = "application/json",
-
-                            array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class)),
+                            schema = @Schema(implementation = Page.class),
                             examples = @ExampleObject(value = """
                                     {
                                         "content": [
@@ -175,16 +187,42 @@ public class RecipeController {
                                                 "difficulty": "EASY",
                                                 "featured": true,
                                                 "authorName": "Chef Pro"
+                                            },
+                                            {
+                                                "id": 2,
+                                                "title": "Risotto Milano",
+                                                "minutes": 25,
+                                                "difficulty": "MEDIUM",
+                                                "featured": false,
+                                                "authorName": "Chef María"
                                             }
                                         ],
                                         "page": {
                                             "size": 20,
-                                            "totalElements": 1,
+                                            "totalElements": 2,
                                             "totalPages": 1,
                                             "number": 0
                                         }
                                     }
                                     """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Acceso denegado. Se requiere rol ADMIN",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = org.springframework.http.ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error/acceso-denegado",
+                                                "title": "Acceso denegado",
+                                                "status": 403,
+                                                "detail": "No tienes permisos para acceder a este recurso"
+                                            }
+                                            """
+                            )
                     )
             )
     })
@@ -212,12 +250,18 @@ public class RecipeController {
                                     {
                                         "id": 1,
                                         "title": "Pasta Carbonara Premium",
-                                        "description": "Versión mejorada",
+                                        "description": "Versión mejorada con ingredientes premium",
                                         "minutes": 20,
                                         "difficulty": "MEDIUM",
                                         "featured": false,
                                         "authorName": "Chef Pro",
-                                        "ingredients": []
+                                        "ingredients": [
+                                            {
+                                                "name": "Espaguetis",
+                                                "quantity": 200.0,
+                                                "unit": "g"
+                                            }
+                                        ]
                                     }
                                     """)
                     )
@@ -225,12 +269,45 @@ public class RecipeController {
             @ApiResponse(
                     responseCode = "400",
                     description = "Datos de entrada inválidos (error de validación)",
-                    content = @Content
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = org.springframework.http.ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error/solicitud-invalida",
+                                                "title": "Solicitud inválida",
+                                                "status": 400,
+                                                "detail": "El título de la receta es obligatorio",
+                                                "invalid-params": [
+                                                    {
+                                                        "object": "recipeRequest",
+                                                        "field": "title",
+                                                        "message": "no debe estar vacío"
+                                                    }
+                                                ]
+                                            }
+                                            """
+                            )
+                    )
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = "No se encontró la receta con el ID proporcionado",
-                    content = @Content
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = org.springframework.http.ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontró la receta con ID: 999"
+                                            }
+                                            """
+                            )
+                    )
             )
     })
     public RecipeDetailsResponse edit(
@@ -279,7 +356,32 @@ public class RecipeController {
             @ApiResponse(
                     responseCode = "400",
                     description = "Los datos de la receta no son válidos",
-                    content = @Content
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = org.springframework.http.ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error/solicitud-invalida",
+                                                "title": "Solicitud inválida",
+                                                "status": 400,
+                                                "detail": "Error al validar los campos del formulario",
+                                                "invalid-params": [
+                                                    {
+                                                        "object": "recipeRequest",
+                                                        "field": "title",
+                                                        "message": "no debe estar vacío"
+                                                    },
+                                                    {
+                                                        "object": "recipeRequest",
+                                                        "field": "minutes",
+                                                        "message": "debe ser mayor a 0"
+                                                    }
+                                                ]
+                                            }
+                                            """
+                            )
+                    )
             )
     })
     public ResponseEntity<RecipeDetailsResponse> save(
@@ -304,13 +406,25 @@ public class RecipeController {
     @ApiResponses({
             @ApiResponse(
                     responseCode = "204",
-                    description = "La receta ha sido eliminada con éxito",
-                    content = @Content 
+                    description = "La receta ha sido eliminada con éxito"
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = "No se pudo eliminar: la receta no existe",
-                    content = @Content
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = org.springframework.http.ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontró la receta con ID: 999"
+                                            }
+                                            """
+                            )
+                    )
             )
     })
     public ResponseEntity<Void> delete(
@@ -330,7 +444,47 @@ public class RecipeController {
                     description = "Resultados obtenidos satisfactoriamente",
                     content = @Content(
                             mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class))
+                            array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class)),
+                            examples = @ExampleObject(
+                                    value = """
+                                            [
+                                                {
+                                                    "id": 1,
+                                                    "title": "Pasta Carbonara",
+                                                    "minutes": 15,
+                                                    "difficulty": "EASY",
+                                                    "featured": true,
+                                                    "authorName": "Chef Pro"
+                                                },
+                                                {
+                                                    "id": 5,
+                                                    "title": "Ensalada César",
+                                                    "minutes": 10,
+                                                    "difficulty": "EASY",
+                                                    "featured": false,
+                                                    "authorName": "Ana García"
+                                                }
+                                            ]
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Criterios de búsqueda inválidos",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = org.springframework.http.ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error/solicitud-invalida",
+                                                "title": "Solicitud inválida",
+                                                "status": 400,
+                                                "detail": "Los criterios de búsqueda proporcionados no son válidos"
+                                            }
+                                            """
+                            )
                     )
             )
     })
@@ -352,8 +506,68 @@ public class RecipeController {
     @Operation(summary = "Obtener recetas de un usuario específico",
             description = "Recupera todas las recetas asociadas al UUID de un autor. " +
                     "El nombre del autor se resuelve mediante el servicio de usuarios.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Recetas del usuario obtenidas exitosamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "content": [
+                                                    {
+                                                        "id": 1,
+                                                        "title": "Pasta Carbonara",
+                                                        "minutes": 15,
+                                                        "difficulty": "EASY",
+                                                        "featured": true,
+                                                        "authorName": "Chef Pro"
+                                                    },
+                                                    {
+                                                        "id": 2,
+                                                        "title": "Risotto Milano",
+                                                        "minutes": 25,
+                                                        "difficulty": "MEDIUM",
+                                                        "featured": false,
+                                                        "authorName": "Chef Pro"
+                                                    }
+                                                ],
+                                                "page": {
+                                                    "size": 20,
+                                                    "totalElements": 2,
+                                                    "totalPages": 1,
+                                                    "number": 0
+                                                }
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuario no encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = org.springframework.http.ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontró el usuario con UUID: a1b2c3d4-0000-0000-0000-000000000099"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     public Page<RecipeResponse> findByUser(
+            @Parameter(description = "UUID del usuario", example = "a1b2c3d4-0000-0000-0000-000000000001")
             @PathVariable UUID id,
+            @Parameter(description = "Parámetros de paginación (page, size, sort)")
             Pageable pageable) {
 
         String authorUsername = customUserDetailsService.findById(id)
@@ -373,8 +587,58 @@ public class RecipeController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Página de recetas destacadas recuperada con éxito",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Page.class))
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "content": [
+                                                    {
+                                                        "id": 1,
+                                                        "title": "Pasta Carbonara",
+                                                        "minutes": 15,
+                                                        "difficulty": "EASY",
+                                                        "featured": true,
+                                                        "authorName": "Chef Pro"
+                                                    },
+                                                    {
+                                                        "id": 3,
+                                                        "title": "Tortilla Española",
+                                                        "minutes": 20,
+                                                        "difficulty": "EASY",
+                                                        "featured": true,
+                                                        "authorName": "Chef María"
+                                                    }
+                                                ],
+                                                "page": {
+                                                    "size": 10,
+                                                    "totalElements": 2,
+                                                    "totalPages": 1,
+                                                    "number": 0
+                                                }
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontraron recetas destacadas",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = org.springframework.http.ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontraron recetas destacadas"
+                                            }
+                                            """
+                            )
+                    )
             )
     })
     public Page<RecipeResponse> findByFeatured(
@@ -397,10 +661,25 @@ public class RecipeController {
         });
     }
 
-    @Operation(summary = "Eliminar una receta", description = "Elimina una receta específica por su ID. ")
+    @Operation(summary = "Eliminar una receta (Admin)", description = "Elimina una receta específica por su ID de forma permanente.")
     @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Receta eliminada con éxito", content = @Content),
-        @ApiResponse(responseCode = "404", description = "No se encontró la receta con el ID proporcionado", content = @Content)
+            @ApiResponse(responseCode = "204", description = "Receta eliminada con éxito"),
+            @ApiResponse(responseCode = "404", description = "No se encontró la receta con el ID proporcionado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = org.springframework.http.ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontró la receta con ID: 999"
+                                            }
+                                            """
+                            )
+                    )
+            )
     })
     @DeleteMapping("/admin/recipe/delete/{id}")
     public ResponseEntity<Void> deleteRecipe(

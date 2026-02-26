@@ -36,15 +36,55 @@ public class MenuItemController {
 
     @Operation(summary = "Planificar una comida (crear MenuItem)")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "MenuItem creado",
+            @ApiResponse(responseCode = "201", description = "MenuItem creado exitosamente",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MenuItemResponse.class))),
+                            schema = @Schema(implementation = MenuItemResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "id": 1,
+                                                "date": "2024-09-23",
+                                                "mealType": "LUNCH",
+                                                "receta": {
+                                                    "id": 1,
+                                                    "title": "Tortilla Española",
+                                                    "minutes": 20
+                                                }
+                                            }
+                                            """
+                            )
+                    )
+            ),
             @ApiResponse(responseCode = "400", description = "Datos inválidos o ya existe planificación para ese día/tipo",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ProblemDetail.class))),
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error/solicitud-invalida",
+                                                "title": "Solicitud inválida",
+                                                "status": 400,
+                                                "detail": "Ya existe una planificación para el 2024-09-23 a las 12:00"
+                                            }
+                                            """
+                            )
+                    )
+            ),
             @ApiResponse(responseCode = "404", description = "Receta no encontrada",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ProblemDetail.class)))
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontró la receta con ID: 999"
+                                            }
+                                            """
+                            )
+                    )
+            )
     })
     @PostMapping("/menuitem")
     public ResponseEntity<MenuItemResponse> create(@Valid @RequestBody MenuItemRequest request) {
@@ -54,7 +94,7 @@ public class MenuItemController {
     @Operation(summary = "Obtener planificación entre dos fechas",
             description = "Devuelve una lista de MenuItem planificados entre las fechas indicadas, ordenados por fecha y tipo de comida.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista de MenuItem entre fechas",
+            @ApiResponse(responseCode = "200", description = "Lista de MenuItem entre fechas obtenida exitosamente",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = MenuItemResponse.class),
@@ -68,7 +108,7 @@ public class MenuItemController {
                                                     "receta": {
                                                         "id": 1,
                                                         "title": "Tortilla Española",
-                                                        ...
+                                                        "minutes": 20
                                                     }
                                                 },
                                                 {
@@ -78,7 +118,7 @@ public class MenuItemController {
                                                     "receta": {
                                                         "id": 2,
                                                         "title": "Ensalada César",
-                                                        ...
+                                                        "minutes": 10
                                                     }
                                                 }
                                             ]
@@ -92,16 +132,15 @@ public class MenuItemController {
                             examples = @ExampleObject(
                                     value = """
                                             {
-                                              "type": "https://example.com/invaliddaterange",
-                                              "title": "Rango de fechas no válido",
-                                              "status": 400,
-                                              "detail": "La fecha de inicio debe ser anterior a la fecha de fin."
+                                                "type": "chefplanner.com/error/solicitud-invalida",
+                                                "title": "Solicitud inválida",
+                                                "status": 400,
+                                                "detail": "La fecha de inicio debe ser anterior a la fecha de fin."
                                             }
                                             """
                             )
-
                     )
-            ),
+            )
     })
     @GetMapping("/menuitem")
     public ResponseEntity<List<MenuItemResponse>> getByRange(
@@ -117,13 +156,37 @@ public class MenuItemController {
 
     @Operation(summary = "Eliminar planificación de un día y tipo de comida")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "MenuItem eliminado"),
+            @ApiResponse(responseCode = "204", description = "MenuItem eliminado exitosamente"),
             @ApiResponse(responseCode = "400", description = "Datos de borrado no válidos",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ProblemDetail.class))),
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error/solicitud-invalida",
+                                                "title": "Solicitud inválida",
+                                                "status": 400,
+                                                "detail": "Los parámetros de fecha y tipo de comida son requeridos"
+                                            }
+                                            """
+                            )
+                    )
+            ),
             @ApiResponse(responseCode = "404", description = "Planificación no encontrada",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ProblemDetail.class)))
+                            schema = @Schema(implementation = ProblemDetail.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "type": "chefplanner.com/error",
+                                                "title": "Entidad no encontrada",
+                                                "status": 404,
+                                                "detail": "No se encontró planificación para el 2024-09-23 a las 12:00"
+                                            }
+                                            """
+                            )
+                    )
+            )
     })
     @DeleteMapping("/menuitem")
     public ResponseEntity<Void> delete(
