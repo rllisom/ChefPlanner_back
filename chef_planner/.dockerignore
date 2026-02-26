@@ -1,0 +1,24 @@
+# Maven / build
+target/
+**/target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# Git
+.git/
+.gitignore
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Docker
+docker-compose*.yml
