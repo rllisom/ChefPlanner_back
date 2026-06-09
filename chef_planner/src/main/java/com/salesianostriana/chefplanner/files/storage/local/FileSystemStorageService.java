@@ -52,6 +52,11 @@ public class FileSystemStorageService implements StorageService {
         }
     }
 
+    @Override
+    public FileMetadata store(MultipartFile file, String folder) {
+        return null;
+    }
+
     private String store(byte[] file, String filename, String contentType) throws Exception {
         String newFilename = StringUtils.cleanPath(filename);
 

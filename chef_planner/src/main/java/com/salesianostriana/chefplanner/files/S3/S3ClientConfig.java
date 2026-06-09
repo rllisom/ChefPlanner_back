@@ -3,6 +3,7 @@ package com.salesianostriana.chefplanner.files.S3;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -10,9 +11,9 @@ import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.S3Client;
 import java.net.URI;
 
+
 @Configuration
 public class S3ClientConfig {
-
     @Bean
     public S3Client s3Client(
             @Value("${storage.s3.region}") String region,
@@ -22,7 +23,7 @@ public class S3ClientConfig {
     ) {
         var creds = StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
         var s3cfg = S3Configuration.builder()
-                .pathStyleAccessEnabled(true) // Crucial para MinIO
+                .pathStyleAccessEnabled(true) // Obligatorio para MinIO
                 .build();
 
         var builder = S3Client.builder()
@@ -30,10 +31,9 @@ public class S3ClientConfig {
                 .credentialsProvider(creds)
                 .serviceConfiguration(s3cfg);
 
-        if (endpoint != null && !endpoint.isBlank()) {
-            builder = builder.endpointOverride(URI.create(endpoint));
+        if (StringUtils.hasText(endpoint)) {
+            builder.endpointOverride(URI.create(endpoint));
         }
-
         return builder.build();
     }
 }
