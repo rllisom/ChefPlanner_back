@@ -11,3 +11,4 @@ public class RecipeNotFoundException extends EntityNotFoundException {
         super("Receta con ID " + id + " no encontrada.");
     }
 }
+

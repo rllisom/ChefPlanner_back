@@ -9,18 +9,19 @@ services:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATASOURCE_PASSWORD_FILE: /run/secrets/db_password
     ports:
       - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
+    secrets:
+      - db_password
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
       interval: 10s
       timeout: 3s
       retries: 20
-    restart: always
 
   postgres:
     image: postgres:16-alpine
@@ -28,15 +29,20 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
     volumes:
-      - pgdata_prod:/var/lib/postgresql/data
+      - ${APP_NAME}_pgdata:/var/lib/postgresql/data
+    secrets:
+      - db_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 3s
       retries: 20
-    restart: always
+
+secrets:
+  db_password:
+    file: ./secrets/prod_db_password.txt
 
 volumes:
-  pgdata_prod:
+  ${APP_NAME}_pgdata:

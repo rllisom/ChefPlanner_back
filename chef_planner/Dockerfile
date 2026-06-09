@@ -1,33 +1,43 @@
-
-FROM maven:3-eclipse-temurin-21 AS build
+# =========================
+# Stage 1: build (Maven + JDK 25)
+# =========================
+FROM maven:3-eclipse-temurin-25 AS build
 WORKDIR /app
 
-COPY pom.xml .
+# Copiamos primero lo mínimo para cachear dependencias
+COPY pom.xml ./
+COPY .mvn/ .mvn/
+COPY mvnw ./
 
-RUN mvn -DskipTests dependency:go-offline
+# Asegurar permisos + evitar CRLF en mvnw
+RUN chmod +x mvnw && sed -i 's/\r$//' mvnw
 
+# Descargar dependencias (mejor caché)
+RUN ./mvnw -DskipTests dependency:go-offline
+
+# Copiamos el código y compilamos
 COPY src/ src/
+RUN ./mvnw -DskipTests package
 
-RUN mvn -DskipTests package
-
-
-FROM eclipse-temurin:21-jre-alpine
+# =========================
+# Stage 2: runtime (JRE 25)
+# =========================
+FROM eclipse-temurin:25-jre-alpine AS runtime
 WORKDIR /app
 
-RUN mkdir ./uploads
-
+# Usuario no-root
 RUN addgroup -S spring && adduser -S spring -G spring
 
+# Copiar jar
 COPY --from=build /app/target/*.jar /app/app.jar
-COPY docker/entrypoint.sh /app/entrypoint.sh
 
-
-RUN sed -i 's/\r$//' /app/entrypoint.sh
+# Copiar entrypoint
+COPY ./docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 USER spring:spring
 
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseContainerSupport"
-EXPOSE 8080
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom"
+EXPOSE 8081
 
 ENTRYPOINT ["/app/entrypoint.sh"]
